@@ -87,7 +87,7 @@ ConsoleTest (char *in, char *out)
       {
 	  readAvail->P ();	// wait for character to arrive
 	  ch = console->GetChar ();
-	  if (ch == 'q' || ch == EOF)
+	  if (ch == EOF)
 	      return;		// if q, quit
 
 	  if (ch != '\n')
