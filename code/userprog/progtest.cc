@@ -1,11 +1,11 @@
-// progtest.cc 
+// progtest.cc
 //      Test routines for demonstrating that Nachos can load
-//      a user program and execute it.  
+//      a user program and execute it.
 //
 //      Also, routines for testing the Console hardware device.
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -20,29 +20,28 @@
 //      memory, and jump to it.
 //----------------------------------------------------------------------
 
-void
-StartProcess (char *filename)
+void StartProcess(char *filename)
 {
-    OpenFile *executable = fileSystem->Open (filename);
-    AddrSpace *space;
+	OpenFile *executable = fileSystem->Open(filename);
+	AddrSpace *space;
 
-    if (executable == NULL)
-      {
-	  printf ("Unable to open file %s\n", filename);
-	  return;
-      }
-    space = new AddrSpace (executable);
-    currentThread->space = space;
+	if (executable == NULL)
+	{
+		printf("Unable to open file %s\n", filename);
+		return;
+	}
+	space = new AddrSpace(executable);
+	currentThread->space = space;
 
-    delete executable;		// close file
+	delete executable; // close file
 
-    space->InitRegisters ();	// set the initial register values
-    space->RestoreState ();	// load page table register
+	space->InitRegisters(); // set the initial register values
+	space->RestoreState();	// load page table register
 
-    machine->Run ();		// jump to the user progam
-    ASSERT (FALSE);		// machine->Run never returns;
-    // the address space exits
-    // by doing the syscall "exit"
+	machine->Run(); // jump to the user progam
+	ASSERT(FALSE);	// machine->Run never returns;
+	// the address space exits
+	// by doing the syscall "exit"
 }
 
 // Data structures needed for the console test.  Threads making
@@ -58,14 +57,14 @@ static Semaphore *writeDone;
 //----------------------------------------------------------------------
 
 static void
-ReadAvail (int arg)
+ReadAvail(int arg)
 {
-    readAvail->V ();
+	readAvail->V();
 }
 static void
-WriteDone (int arg)
+WriteDone(int arg)
 {
-    writeDone->V ();
+	writeDone->V();
 }
 
 //----------------------------------------------------------------------
@@ -74,22 +73,33 @@ WriteDone (int arg)
 //      the output.  Stop when the user types a 'q'.
 //----------------------------------------------------------------------
 
-void
-ConsoleTest (char *in, char *out)
+void ConsoleTest(char *in, char *out)
 {
-    char ch;
+	char ch, lastCh;
 
-    console = new Console (in, out, ReadAvail, WriteDone, 0);
-    readAvail = new Semaphore ("read avail", 0);
-    writeDone = new Semaphore ("write done", 0);
+	console = new Console(in, out, ReadAvail, WriteDone, 0);
+	readAvail = new Semaphore("read avail", 0);
+	writeDone = new Semaphore("write done", 0);
 
-    for (;;)
-      {
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
-	  console->PutChar (ch);	// echo it!
-	  writeDone->P ();	// wait for write to finish
-	  if (ch == 'q')
-	      return;		// if q, quit
-      }
+	lastCh = '\n';
+	for (;;)
+	{
+		readAvail->P(); // wait for character to arrive
+		ch = console->GetChar();
+
+		if ((lastCh == '\n' && ch == '\t') || ch == EOF)
+			return;
+		else if (ch != '\n')
+		{
+			console->PutChar('<');
+			writeDone->P();
+			console->PutChar(ch); // echo it!
+			writeDone->P();		  // wait for write to finish
+			console->PutChar('>');
+			writeDone->P();
+			// if (ch == 'q')
+			// 	return; // if q, quit
+		}
+		lastCh = ch;
+	}
 }
