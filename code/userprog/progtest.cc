@@ -1,11 +1,11 @@
-// progtest.cc 
+// progtest.cc
 //      Test routines for demonstrating that Nachos can load
-//      a user program and execute it.  
+//      a user program and execute it.
 //
 //      Also, routines for testing the Console hardware device.
 //
 // Copyright (c) 1992-1993 The Regents of the University of California.
-// All rights reserved.  See copyright.h for copyright notice and limitation 
+// All rights reserved.  See copyright.h for copyright notice and limitation
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
@@ -21,8 +21,7 @@
 //      memory, and jump to it.
 //----------------------------------------------------------------------
 
-void
-StartProcess (char *filename)
+void StartProcess(char *filename)
 {
 	OpenFile *executable = fileSystem->Open (filename);
 	AddrSpace *space;
@@ -58,15 +57,15 @@ static Semaphore *writeDone;
 //      Wake up the thread that requested the I/O.
 //----------------------------------------------------------------------
 
-	static void
-ReadAvail (int arg)
+static void
+ReadAvail(int arg)
 {
-	readAvail->V ();
+	readAvail->V();
 }
-	static void
-WriteDone (int arg)
+static void
+WriteDone(int arg)
 {
-	writeDone->V ();
+	writeDone->V();
 }
 
 //----------------------------------------------------------------------
@@ -75,8 +74,7 @@ WriteDone (int arg)
 //      the output.  Stop when the user types ctrl+D, or at end of file.
 //----------------------------------------------------------------------
 
-void
-ConsoleTest (char *in, char *out)
+void ConsoleTest(char *in, char *out)
 {
 	char ch;
 
@@ -120,6 +118,7 @@ SynchConsoleTest (char *in, char *out)
 	char ch;
 
 	// SynchConsole *synchconsole = new SynchConsole(in, out);
+	// The SynchConsole is now global, so this line is not needed.
 
 	while ((ch = synchconsole->SynchGetChar()) != EOF)
 	{
@@ -130,7 +129,6 @@ SynchConsoleTest (char *in, char *out)
 			synchconsole->SynchPutChar('>');
 	}
 	fprintf(stderr, "Solaris: EOF detected in SynchConsole !\n");
-
 }
 
 
