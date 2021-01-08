@@ -83,6 +83,13 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_GetChar: {
+					DEBUG('a', "GetChar, called by user.\n");
+					machine->WriteRegister(2, synchconsole->SynchGetChar());
+					break;
+				}
+
+
 				case SC_Exit: {
 					DEBUG('a', "Exit, called by user.\n");
 					interrupt->Exit(machine->ReadRegister(4));

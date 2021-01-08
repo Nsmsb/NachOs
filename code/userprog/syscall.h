@@ -30,6 +30,7 @@
 #define SC_Fork		9
 #define SC_Yield	10
 #define SC_PutChar 11
+#define SC_GetChar 12
 
 #ifdef IN_USER_MODE
 
@@ -132,6 +133,10 @@ void Yield ();
 /* Writes one character in buffer.
  */
 void PutChar(char c);
+
+/* Gets a character from buffer.
+ */
+int GetChar();
 
 #endif // IN_USER_MODE
 

@@ -22,5 +22,5 @@ main()
 {
 	print('a', 4);
 	//Halt();
-	return 6;
+	return 0;
 }
