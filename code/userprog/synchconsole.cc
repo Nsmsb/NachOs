@@ -49,10 +49,33 @@ char SynchConsole::SynchGetChar()
 
 void SynchConsole::SynchPutString(const char s[])
 {
-	// A completer.
+	for(int i=0 ; i < MAX_STRING_SIZE && s[i] != '\0' ; i++){
+		SynchPutChar(s[i]);
+	}
 }
 
 void SynchConsole::SynchGetString(char *s, int n)
 {
 	// A completer.
+}
+
+/* copyStringFromMachine(int from, char *to, unsigned size)
+ *	Copies a string at MIPS adress "from"
+ *	into a kernel pointer string "to".
+ *	Up to size character are copied. The string is terminated
+ *	by a '\0' even if none were copied.
+ */
+void SynchConsole::copyStringFromMachine(int from, char *to, unsigned size)
+{
+	unsigned i = 0;
+	int val = 0;
+	// We stop at i = size-1 so we can put the '\0' character.
+	for(i = 0 ; i < size-1 ; i++){
+		machine->ReadMem(from, 1, &val);
+		to[i] = (char) val;
+		if(val == '\0')
+			return;
+		from++;
+	}
+	to[i] = '\0';
 }

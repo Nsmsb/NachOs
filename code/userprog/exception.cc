@@ -89,6 +89,13 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_PutString: {
+					DEBUG('a', "PutString, called by user.\n");
+					char buffer[MAX_STRING_SIZE];	
+					synchconsole->copyStringFromMachine(machine->ReadRegister(4), buffer, MAX_STRING_SIZE);
+					synchconsole->SynchPutString(buffer);
+					break;
+				}
 
 				case SC_Exit: {
 					DEBUG('a', "Exit, called by user.\n");

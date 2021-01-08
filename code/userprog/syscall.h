@@ -31,6 +31,7 @@
 #define SC_Yield	10
 #define SC_PutChar 11
 #define SC_GetChar 12
+#define SC_PutString 13
 
 #ifdef IN_USER_MODE
 
@@ -137,6 +138,10 @@ void PutChar(char c);
 /* Gets a character from buffer.
  */
 int GetChar();
+
+/* Copies a string to kernel.
+ */
+void PutString(char* str);
 
 #endif // IN_USER_MODE
 

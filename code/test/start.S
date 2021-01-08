@@ -145,6 +145,14 @@ GetChar:
 	j	$31
 	.end Halt
 
+	.globl PutString
+	.ent	PutSring
+PutString:
+	addiu $2,$0,SC_PutString
+	syscall
+	j	$31
+	.end Halt
+
 
 
 
