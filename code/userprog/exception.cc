@@ -83,6 +83,12 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_Exit: {
+					DEBUG('a', "Exit, called by user.\n");
+					interrupt->Exit(machine->ReadRegister(4));
+					break;
+				}
+
 				default: {
 					printf("Unexpected user mode exception %d %d\n", which, type);
 				}

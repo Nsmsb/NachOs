@@ -249,6 +249,31 @@ Interrupt::Halt()
 }
 
 //----------------------------------------------------------------------
+// Interrupt::Exit
+//  Shuts down NachOS after a user program, displays the return value
+//	and the associated message.
+//----------------------------------------------------------------------
+void
+Interrupt::Exit(int value)
+{
+		printf("User program terminated with value %d\n", value);
+		switch(value) {
+			case 0: {
+				printf("The program terminated correctly.\n\n");
+				break;
+			}
+
+			default: {
+				printf("Unknown error code.\n\n");
+				break;
+			}
+		}
+		
+		Cleanup();
+
+}
+
+//----------------------------------------------------------------------
 // Interrupt::Schedule
 // 	Arrange for the CPU to be interrupted when simulated time
 //	reaches "now + when".
