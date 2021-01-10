@@ -10,14 +10,12 @@
 
 #include "syscall.h"
 
-void read(int n)
+void read()
 {
-	int i;
-	char c;
-	for(i = 0 ; i < n ; i++){
-		c = (char) GetChar();
+	int c;
+	while((c = GetChar() ) > 0){
 		PutChar('<');
-		PutChar(c);
+		PutChar((char) c);
 		PutChar('>');
 	}
 	PutChar('\n');
@@ -26,7 +24,7 @@ void read(int n)
 int
 main()
 {
-	read(10);
+	read();
 	//Halt();
 	return 0;
 }
