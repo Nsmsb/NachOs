@@ -153,7 +153,13 @@ PutString:
 	j	$31
 	.end Halt
 
-
+	.globl GetString
+	.ent	GetString
+GetString:
+	addiu $2,$0,SC_GetString
+	syscall
+	j $31
+	.end Halt
 
 
 /* dummy function to keep gcc happy */

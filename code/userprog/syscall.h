@@ -32,6 +32,7 @@
 #define SC_PutChar 11
 #define SC_GetChar 12
 #define SC_PutString 13
+#define SC_GetString 14
 
 #ifdef IN_USER_MODE
 
@@ -142,6 +143,11 @@ int GetChar();
 /* Copies a string to kernel.
  */
 void PutString(char* str);
+
+/* Copies a string from kernel to MIPS.
+ */
+void GetString(char* adr, int size);
+
 
 #endif // IN_USER_MODE
 

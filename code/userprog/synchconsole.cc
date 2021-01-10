@@ -54,9 +54,23 @@ void SynchConsole::SynchPutString(const char s[])
 	}
 }
 
-void SynchConsole::SynchGetString(char *s, int n)
+void SynchConsole::SynchGetString(char *s, int size)
 {
-	// A completer.
+	int i = 0;
+	char c;
+
+	// This feels *very* convoluted.
+	// We read "At most one less than size charaters" (see fgets specs')
+	if(size > 1){
+		do{
+			c = SynchGetChar();
+			s[i] = c;
+			i++;
+		}while((i < size-1) && (c >= 0) && (c != '\n'));
+	}
+
+	// Adding the terminating byte after the last character.
+	s[i] = '\0';
 }
 
 /* copyStringFromMachine(int from, char *to, unsigned size)
@@ -78,4 +92,26 @@ void SynchConsole::copyStringFromMachine(int from, char *to, unsigned size)
 		from++;
 	}
 	to[i] = '\0';
+}
+
+/* copyStringToMachine
+ *	Copies a kernel string "from" to a user string
+ *	at MIPS adress "to".
+ *	size characters are copied
+ *
+ *	IMPORTANT : We assume the String comes from SynchGetString, so
+ *	there is a '\0' and it's after the first \n, or somewhere if there
+ *	are none.
+ */
+// Note : this function could be simplified, assuming the string comes from SynchGetChar.
+void SynchConsole::copyStringToMachine(int to, char *from, unsigned size)
+{
+	unsigned i = 0;
+	// We stop at size-1, since the last char is \0 ; and we don't want to overflow
+	while(i < size-1 && from[i] > 0){
+		machine->WriteMem(to, 1, from[i]);
+		to++;
+		i++;
+	}
+	machine->WriteMem(to, 1, from[i]);
 }

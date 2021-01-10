@@ -97,6 +97,19 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_GetString: {
+					DEBUG('a', "GetString, called by user.\n");
+					char buffer[MAX_STRING_SIZE];
+					int adr = machine->ReadRegister(4);
+					int taille = machine->ReadRegister(5);
+					if(taille > MAX_STRING_SIZE)
+						taille = MAX_STRING_SIZE;
+
+					synchconsole->SynchGetString(buffer, taille);
+					synchconsole->copyStringToMachine(adr, buffer, taille);
+					break;
+				}
+
 				case SC_Exit: {
 					DEBUG('a', "Exit, called by user.\n");
 					interrupt->Exit(machine->ReadRegister(4));
