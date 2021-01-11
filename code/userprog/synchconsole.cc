@@ -124,7 +124,7 @@ void SynchConsole::SynchPutInt(int n)
 	delete n_string
 }
 
-void SynchConsole::SynchGetInt(int n)
+void SynchConsole::SynchGetInt(int* n)
 {
 
 }
