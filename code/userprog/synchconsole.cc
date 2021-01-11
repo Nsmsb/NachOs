@@ -115,3 +115,11 @@ void SynchConsole::copyStringToMachine(int to, char *from, unsigned size)
 	}
 	machine->WriteMem(to, 1, from[i]);
 }
+
+void SynchConsole::SynchPutInt( int n)
+{
+	char* n_string =  new char(MAX_STRING_SIZE);
+	snprintf(n_string,MAX_STRING_SIZE,"%d",n);
+	synchconsole->SynchPutString(n_string);
+}
+

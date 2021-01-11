@@ -33,6 +33,8 @@
 #define SC_GetChar 12
 #define SC_PutString 13
 #define SC_GetString 14
+#define SC_SynchPutInt 15
+#define SC_SynchGetInt 16
 
 #ifdef IN_USER_MODE
 
