@@ -72,25 +72,27 @@ ExceptionHandler (ExceptionType which)
 		if (which == SyscallException){
 			switch(type){
 				case SC_Halt: {
-					DEBUG('a', "Shutdown, initated by user program.\n");
+					DEBUG('c', "Shutdown, initated by user program.\n");
 					interrupt->Halt();
 					break;
 				}
 
 				case SC_PutChar: {
-					DEBUG('a', "PutChar, called by user.\n");
+					DEBUG('c', "PutChar, called by user.\n");
+					DEBUG('c', "arg1 (character) = %d\n", machine->ReadRegister(4));
 					synchconsole->SynchPutChar((char) machine->ReadRegister(4));
 					break;
 				}
 
 				case SC_GetChar: {
-					DEBUG('a', "GetChar, called by user.\n");
+					DEBUG('c', "GetChar, called by user.\n");
 					machine->WriteRegister(2, synchconsole->SynchGetChar());
 					break;
 				}
 
 				case SC_PutString: {
-					DEBUG('a', "PutString, called by user.\n");
+					DEBUG('c', "PutString, called by user.\n");
+					DEBUG('c', "arg1 (from) = %d\n", machine->ReadRegister(4));
 					char buffer[MAX_STRING_SIZE];	
 					synchconsole->copyStringFromMachine(machine->ReadRegister(4), buffer, MAX_STRING_SIZE);
 					synchconsole->SynchPutString(buffer);
@@ -98,20 +100,22 @@ ExceptionHandler (ExceptionType which)
 				}
 
 				case SC_GetString: {
-					DEBUG('a', "GetString, called by user.\n");
+					DEBUG('c', "GetString, called by user.\n");
+					DEBUG('c', "arg1 (to) = %d\n", machine->ReadRegister(4));
+					DEBUG('c', "arg2 (size) = %d\n", machine->ReadRegister(5));
 					char buffer[MAX_STRING_SIZE];
 					int adr = machine->ReadRegister(4);
-					int taille = machine->ReadRegister(5);
-					if(taille > MAX_STRING_SIZE)
-						taille = MAX_STRING_SIZE;
+					int size = machine->ReadRegister(5);
+					if(size > MAX_STRING_SIZE)
+						size = MAX_STRING_SIZE;
 
-					synchconsole->SynchGetString(buffer, taille);
-					synchconsole->copyStringToMachine(adr, buffer, taille);
+					synchconsole->SynchGetString(buffer, size);
+					synchconsole->copyStringToMachine(adr, buffer, size);
 					break;
 				}
 
 				case SC_Exit: {
-					DEBUG('a', "Exit, called by user.\n");
+					DEBUG('c', "Exit, called by user.\n");
 					interrupt->Exit(machine->ReadRegister(4));
 					break;
 				}
