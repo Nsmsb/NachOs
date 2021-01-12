@@ -110,17 +110,18 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
-				case SC_SynchPutInt: {
-					DEBUG('a', "SynchPutInt(), called by user.\n");
+				case SC_PutInt: {
+					DEBUG('a', "PutInt(), called by user.\n");
 					int n = machine->ReadRegister(4);
 					synchconsole->SynchPutInt(n);
-				break;
+					break;
 				}
 
-				case SC_SynchGetInt: {
-					DEBUG('a', "SynchGetInt(), called by user.\n");
+				case SC_GetInt: {
+					DEBUG('a', "GetInt(), called by user.\n");
 					int n = machine->ReadRegister(4);
 					synchconsole->SynchGetInt(&n);
+					break;
 				}
 
 				case SC_Exit: {

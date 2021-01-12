@@ -33,8 +33,8 @@
 #define SC_GetChar 12
 #define SC_PutString 13
 #define SC_GetString 14
-#define SC_SynchPutInt 15
-#define SC_SynchGetInt 16
+#define SC_PutInt 15
+#define SC_GetInt 16
 
 #ifdef IN_USER_MODE
 
@@ -150,6 +150,13 @@ void PutString(char* str);
  */
 void GetString(char* adr, int size);
 
+/* Copies an int to kernel
+ */
+void PutInt(int val);
+
+/* Copies an int from kernel to MIPS
+ */
+void GetInt(int* val);
 
 #endif // IN_USER_MODE
 

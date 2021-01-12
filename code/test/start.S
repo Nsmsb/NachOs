@@ -161,21 +161,21 @@ GetString:
 	j $31
 	.end Halt
 
-	.globl SynchPutInt
-	.ent	SynchPutInt
-SynchPutInt:
-	addiu $2,$0,SC_SynchPutInt
+	.globl PutInt
+	.ent	PutInt
+PutInt:
+	addiu $2,$0,SC_PutInt
 	syscall
 	j	$31
-	.end SynchPutInt
+	.end PutInt
 
-	.globl SynchGetInt
-	.ent	SynchGetInt
-SynchGetInt:
-	addiu $2,$0,SC_SynchGetInt
+	.globl GetInt
+	.ent	GetInt
+GetInt:
+	addiu $2,$0,SC_GetInt
 	syscall
 	j	$31
-	.end SynchGetInt
+	.end GetInt
 
 
 /* dummy function to keep gcc happy */
