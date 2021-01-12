@@ -55,8 +55,10 @@ class Console {
 // internal emulation routines -- DO NOT call these. 
     void WriteDone();	 	// internal routines to signal I/O completion
     void CheckCharAvail();
+    int feof();
 
   private:
+    int fin;
     int readFileNo;			// UNIX file emulating the keyboard 
     int writeFileNo;			// UNIX file emulating the display
     VoidFunctionPtr writeHandler; 	// Interrupt handler to call when 
