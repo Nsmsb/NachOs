@@ -13,7 +13,7 @@
 void read()
 {
 	int c;
-	while((c = GetChar() ) > 0){
+	while((c = GetChar() ) != -1){
 		PutChar('<');
 		PutChar((char) c);
 		PutChar('>');

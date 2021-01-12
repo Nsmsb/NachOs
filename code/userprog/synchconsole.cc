@@ -41,10 +41,10 @@ void SynchConsole::SynchPutChar(const char ch)
 	writeDone->P();
 }
 
-char SynchConsole::SynchGetChar()
+int SynchConsole::SynchGetChar()
 {
 	readAvail->P();
-	return console->GetChar();
+	return (int)console->GetChar();
 }
 
 void SynchConsole::SynchPutString(const char s[])
@@ -57,16 +57,16 @@ void SynchConsole::SynchPutString(const char s[])
 void SynchConsole::SynchGetString(char *s, int size)
 {
 	int i = 0;
-	char c;
+	int c;
 
 	// This feels *very* convoluted.
 	// We read "At most one less than size charaters" (see fgets specs')
 	if(size > 1){
 		do{
 			c = SynchGetChar();
-			s[i] = c;
+			s[i] = (char)c;
 			i++;
-		}while((i < size-1) && (c >= 0) && (c != '\n'));
+		}while((i < size-1) && (c!=EOF) && (c != '\n'));
 	}
 
 	// Adding the terminating byte after the last character.
