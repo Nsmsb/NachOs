@@ -121,10 +121,16 @@ void SynchConsole::SynchPutInt(int n)
 	char* n_string =  new char(MAX_STRING_SIZE);
 	snprintf(n_string,MAX_STRING_SIZE,"%d",n);
 	synchconsole->SynchPutString(n_string);
-	delete n_string
+	delete n_string;
 }
 
 void SynchConsole::SynchGetInt(int* n)
 {
+	int n_int;
+	char* n_string = new char(MAX_STRING_SIZE);
+	SynchGetString(n_string, MAX_STRING_SIZE);
+	sscanf(n_string, "%d", &n_int);
+	machine->WriteMem((int)n, 4, n_int);
+	delete n_string;
 
 }
