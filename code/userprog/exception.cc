@@ -24,6 +24,7 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
+#include "userthread.h"
 
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
@@ -111,6 +112,19 @@ ExceptionHandler (ExceptionType which)
 
 					synchconsole->SynchGetString(buffer, size);
 					synchconsole->copyStringToMachine(adr, buffer, size);
+					break;
+				}
+
+				case SC_UserThreadCreate: {
+					DEBUG('c', "UserThreadCreate : arg1 = %d, arg2 = %d\n", machine->ReadRegister(4), machine->ReadRegister(5));
+					int val;
+					val = do_UserThreadCreate(machine->ReadRegister(4), machine->ReadRegister(5));
+					machine->WriteRegister(2, val);
+					break;
+				}
+
+				case SC_UserThreadExit: {
+					do_UserThreadExit();
 					break;
 				}
 

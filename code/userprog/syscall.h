@@ -33,6 +33,9 @@
 #define SC_GetChar 12
 #define SC_PutString 13
 #define SC_GetString 14
+#define SC_UserThreadCreate 15
+#define SC_UserThreadExit 16
+ 
 
 #ifdef IN_USER_MODE
 
@@ -148,6 +151,14 @@ void PutString(char* str);
  */
 void GetString(char* adr, int size);
 
+/* Creates an user thread that will execute f with arg.
+ * Returns -1 on failure.
+ */
+int UserThreadCreate(void f(void *arg), void *arg);
+
+/* Destroys an user thread.
+ */
+void UserThreadExit();
 
 #endif // IN_USER_MODE
 
