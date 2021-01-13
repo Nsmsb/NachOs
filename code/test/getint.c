@@ -1,8 +1,7 @@
-/* getchar.c
+/* getint.c
  *	Test program for basic I/O system calls.
  *
- *	Echoes each character written, sourrounded by <>.
- *	Reads 10 characters.
+ *	Echoes numbers from 0..5.
  *	
  */
 
@@ -10,13 +9,16 @@
 
 #include "syscall.h"
 
-void read()
+void getint()
 {
-	int c;
-	while((c = GetChar() ) != -1){
+	int n;
+	for (int i = 0; i < 5; i++)
+	{
+		GetInt(&n);
 		PutChar('<');
-		PutChar((char) c);
+		PutInt(n);
 		PutChar('>');
+		PutChar('\n');
 	}
 	PutChar('\n');
 }
@@ -24,7 +26,7 @@ void read()
 int
 main()
 {
-	read();
+	getint();
 	//Halt();
 	return 0;
 }

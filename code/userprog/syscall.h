@@ -33,10 +33,11 @@
 #define SC_GetChar 12
 #define SC_PutString 13
 #define SC_GetString 14
-#define SC_UserThreadCreate 15
-#define SC_UserThreadExit 16
+#define SC_PutInt 15
+#define SC_GetInt 16
+#define SC_UserThreadCreate 17
+#define SC_UserThreadExit 18
  
-
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -150,6 +151,14 @@ void PutString(char* str);
 /* Copies a string from kernel to MIPS.
  */
 void GetString(char* adr, int size);
+
+/* Copies an int to kernel
+ */
+void PutInt(int val);
+
+/* Copies an int from kernel to MIPS
+ */
+void GetInt(int* val);
 
 /* Creates an user thread that will execute f with arg.
  * Returns -1 on failure.

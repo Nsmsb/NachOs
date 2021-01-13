@@ -30,6 +30,9 @@ class SynchConsole {
 
 	void copyStringFromMachine(int from, char *to, unsigned size);
 	void copyStringToMachine(int to, char *from, unsigned size);
+
+	void SynchPutInt(int n);
+	void SynchGetInt(int* n);
   
 	private:
 	Console *console;
