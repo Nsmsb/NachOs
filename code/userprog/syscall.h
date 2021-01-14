@@ -38,6 +38,8 @@
 #define SC_UserThreadCreate 17
 #define SC_UserThreadExit 18
 
+
+
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -160,9 +162,15 @@ void PutInt(int val);
  */
 void GetInt(int* val);
 
-void UserThreadExit();
 
+/* Creates an user thread that will execute f with arg.
+ * Returns -1 on failure.
+ */
 int UserThreadCreate(void f(void *arg), void *arg);
+
+/* Destroys an user thread.
+ */
+void UserThreadExit();
 
 #endif // IN_USER_MODE
 

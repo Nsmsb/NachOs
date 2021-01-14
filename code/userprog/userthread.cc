@@ -33,11 +33,6 @@ static void StartUserThread(int f){
 
 	delete a;
 
-	//fais attendre les prmier threads créé que les dernier thread crée est fini
-	//il faut que nbthread thread soit crée
-	if(tid<nbthread-1){
-		UserThreadJoin(tid+1);		
-	}
 
 	machine->Run();
 
@@ -99,5 +94,5 @@ int do_UserThreadCreate(int f, int arg){
 	t->Fork (StartUserThread,(int)i);
 
 	return  0;
-
 }
+
