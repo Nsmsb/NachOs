@@ -22,6 +22,7 @@ int do_UserThreadCreate(int f, int arg){
 
 	Thread *trd = new Thread("user_thread");
 	trd->space = currentThread->space;
+	trd->space->nbThreads->V();
 	trd->Fork(StartUserThread, (int) str);
 
 	return tid;
@@ -45,5 +46,6 @@ static void StartUserThread(int f){
 }
 
 void do_UserThreadExit(){
+	currentThread->space->nbThreads->P();
 	currentThread->Finish();
 }

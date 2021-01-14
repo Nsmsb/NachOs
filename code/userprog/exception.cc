@@ -145,6 +145,10 @@ ExceptionHandler (ExceptionType which)
 
 				case SC_Exit: {
 					DEBUG('c', "Exit, called by user.\n");
+					while(currentThread->space->nbThreads->getValue() != 0)
+						currentThread->Yield();
+
+					DEBUG('c', "Exit : All threads terminated. Main is now ending.\n");
 					interrupt->Exit(machine->ReadRegister(4));
 					break;
 				}

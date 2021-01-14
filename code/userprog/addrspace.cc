@@ -65,6 +65,8 @@ AddrSpace::AddrSpace (OpenFile * executable)
     NoffHeader noffH;
     unsigned int i, size;
 
+		nbThreads = new Semaphore("nbThreads", 0);
+
     executable->ReadAt ((char *) &noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
 	(WordToHost (noffH.noffMagic) == NOFFMAGIC))
@@ -133,6 +135,7 @@ AddrSpace::~AddrSpace ()
   // delete pageTable;
   delete [] pageTable;
   // End of modification
+	delete nbThreads;
 }
 
 //----------------------------------------------------------------------
