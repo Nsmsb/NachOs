@@ -3,6 +3,7 @@
 //	Routines that simulate a synchronous I/O console.
 //
 
+
 #include "copyright.h"
 #include "system.h"
 #include "synchconsole.h"
@@ -10,6 +11,10 @@
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
+
+static Semaphore *lect;		//Semaphore pour bloquer la lecture a d'autre thread
+static Semaphore *ecr;		//Semaphore pour bloquer l'écriture a d'autre thread
+
 
 static void ReadAvail(int arg)
 {
@@ -25,26 +30,36 @@ SynchConsole::SynchConsole(char *readFile, char *writeFile)
 {
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
+	lect = new Semaphore("lect", 1);
+	ecr = new Semaphore("ecr", 1);
 	console = new Console (readFile, writeFile, ReadAvail, WriteDone, 0);
 }
 
 SynchConsole::~SynchConsole()
 {
 	delete console;
+	delete lect;
+	delete ecr;
 	delete writeDone;
 	delete readAvail;
 }
 
 void SynchConsole::SynchPutChar(const char ch)
-{
+{ 
+	ecr->P();
 	console->PutChar(ch);
 	writeDone->P();
+	ecr->V();
 }
 
-char SynchConsole::SynchGetChar()
+int SynchConsole::SynchGetChar()
 {
+	int c;
+	lect->P();
 	readAvail->P();
-	return console->GetChar();
+	c=console->GetChar();
+	lect->V();
+	return c;
 }
 
 void SynchConsole::SynchPutString(const char s[])

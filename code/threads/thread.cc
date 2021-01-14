@@ -34,6 +34,7 @@
 
 Thread::Thread (const char *threadName)
 {
+    tid =-1;
     name = threadName;
     stackTop = NULL;
     stack = NULL;
@@ -62,7 +63,7 @@ Thread::Thread (const char *threadName)
 
 Thread::~Thread ()
 {
-    DEBUG ('t', "Deleting thread \"%s\"\n", name);
+
 
     ASSERT (this != currentThread);
     if (stack != NULL)
@@ -96,7 +97,6 @@ Thread::Fork (VoidFunctionPtr func, int arg)
 	   name, (int) func, arg);
 
     StackAllocate (func, arg);
-
 #ifdef USER_PROGRAM
 
     // LB: The addrspace should be tramsitted here, instead of later in
@@ -113,6 +113,7 @@ Thread::Fork (VoidFunctionPtr func, int arg)
     scheduler->ReadyToRun (this);	// ReadyToRun assumes that interrupts 
     // are disabled!
     (void) interrupt->SetLevel (oldLevel);
+	
 }
 
 //----------------------------------------------------------------------

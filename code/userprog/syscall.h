@@ -35,6 +35,8 @@
 #define SC_GetString 14
 #define SC_PutInt 15
 #define SC_GetInt 16
+#define SC_UserThreadCreate 17
+#define SC_UserThreadExit 18
 
 #ifdef IN_USER_MODE
 
@@ -157,6 +159,10 @@ void PutInt(int val);
 /* Copies an int from kernel to MIPS
  */
 void GetInt(int* val);
+
+void UserThreadExit();
+
+int UserThreadCreate(void f(void *arg), void *arg);
 
 #endif // IN_USER_MODE
 
