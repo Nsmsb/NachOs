@@ -124,6 +124,7 @@ ExceptionHandler (ExceptionType which)
 				}
 
 				case SC_UserThreadExit: {
+					DEBUG('c', "UserThreadExit.\n");
 					do_UserThreadExit();
 					break;
 				}
