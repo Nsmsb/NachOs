@@ -24,16 +24,29 @@ class Semaphore;
 class AddrSpace
 {
   public:
+
     AddrSpace (OpenFile * executable);	// Create an address space,
     // initializing it with the program
     // stored in the file "executable"
     ~AddrSpace ();		// De-allocate an address space
+
+    void haltv();
+    void haltp();
+    void lockthreadp();
+    void lockthreadv();
+    int allocthread(int tid);
 
     void InitRegisters ();	// Initialize user-level CPU registers,
     // before jumping to user code
 
     void SaveState ();		// Save/restore address space-specific
     void RestoreState ();	// info on a context switch 
+    int userthread;
+    int *tid;			//tableaux indiquant quelle tid est libre pour les nouveaux thread
+				//et si le thread est attendu
+    int *semthread;		//tableaux de Semaphore * convertie en int,chaque Semaphore est
+ 				//relier a un tid
+
 
 		Semaphore *nbThreads;
 

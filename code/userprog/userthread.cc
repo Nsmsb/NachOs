@@ -1,51 +1,98 @@
-/* userthread.cc
- *	Creates, starts and destroys user threads.
- *	
- *
- */
-
-
-#include "userthread.h"
+#include "copyright.h"
 #include "system.h"
-#include "thread.h"
+#include "console.h"
+#include "synchconsole.h"
+#include "addrspace.h"
+#include "synch.h"
+#include "userthread.h"
 
-static void StartUserThread(int f);
 
-
-int do_UserThreadCreate(int f, int arg){
-	int tid = 1;
-	
-	args_t *str = new args_t;
-	str->fonction = f;
-	str->arg = arg;
-	str->SP = machine->ReadRegister(StackReg);
-
-	Thread *trd = new Thread("user_thread");
-	trd->space = currentThread->space;
-	trd->space->nbThreads->V();
-	trd->Fork(StartUserThread, (int) str);
-
-	return tid;
-}
+//prépare un thread utilisateur ,puis le lance sur la fonction voulu
+//f est un pointeure sur int* qui contien les argument de la fonction
 
 
 static void StartUserThread(int f){
-	// Get back the arguments.
-	args_t *str = (args_t *) f;
 
-	for(int i = 0 ; i < NumTotalRegs ; i++){
-		machine->WriteRegister(i, 0);	
-	}
+	int p,*a=(int*)f,tid=a[2];
 
-	machine->WriteRegister(PCReg, str->fonction);
-	machine->WriteRegister(NextPCReg, str->fonction+4);
-	machine->WriteRegister(4, str->arg);
+	currentThread->tid=a[2];
+	currentThread->space->InitRegisters();
 
-	machine->WriteRegister(StackReg, str->SP - 3*PageSize);
+	currentThread->space->RestoreState();
+
+
+	p=machine->ReadRegister(StackReg);
+	
+	machine->WriteRegister (4,a[1]);
+	
+	machine->WriteRegister (StackReg,p-2*(tid+1)*PageSize);
+
+	machine->WriteRegister (PCReg,a[0]);
+	machine->WriteRegister (NextPCReg,a[0]+4);
+
+
+	delete a;
+
+
 	machine->Run();
+
 }
+
+//le thread utilisateur a terminer vient se supprimer et indiquer aux thread qui l'attendais 
+//qu'il a termeiner
 
 void do_UserThreadExit(){
-	currentThread->space->nbThreads->P();
+	
+	currentThread->space->lockthreadp();
+	while(currentThread->space->tid[currentThread->tid]!=0){
+		((Semaphore *)currentThread->space->semthread[currentThread->tid])->V();
+		currentThread->space->tid[currentThread->tid]--;
+	}
+	currentThread->space->tid[currentThread->tid]=-1;
+	currentThread->space->lockthreadv();
+	currentThread->space->userthread--;
+	currentThread->space->haltv();
 	currentThread->Finish();
+	
 }
+
+//le thread appelant attend que le thread tid est fini pour continuer son éxécution
+
+void UserThreadJoin(int tid){
+
+	currentThread->space->tid[tid]++;
+	((Semaphore *)currentThread->space->semthread[tid])->P();
+
+}
+
+
+//prépare la création des thread utilisateur
+
+int do_UserThreadCreate(int f, int arg){
+
+	int *i=new int[3];
+	int j=0;
+	i[0]=f;
+	i[1]=arg;
+	if((VoidFunctionPtr)f==NULL){
+		return -1;
+	}
+	
+	currentThread->space->lockthreadp();
+	while(j<nbthread && currentThread->space->tid[j]!=-1){
+		j++;
+	}
+	if(j>=nbthread){
+		currentThread->space->lockthreadv();
+		return -1;
+	}
+	currentThread->space->userthread++;	
+	currentThread->space->tid[j]=0;
+	currentThread->space->lockthreadv();
+	i[2]=j;
+	Thread *t = new Thread("UserThread");
+	t->Fork (StartUserThread,(int)i);
+
+	return  0;
+}
+

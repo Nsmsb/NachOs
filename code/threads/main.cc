@@ -175,8 +175,7 @@ main (int argc, char **argv)
 			argCount = 2;
 		}
 #endif // NETWORK
-	}
-
+	}	
 	currentThread->Finish ();	// NOTE: if the procedure "main" 
 	// returns, then the program "nachos"
 	// will exit (as any other normal program

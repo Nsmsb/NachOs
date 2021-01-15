@@ -144,6 +144,9 @@ ExceptionHandler (ExceptionType which)
 				}
 
 				case SC_Exit: {
+					while(currentThread->space->userthread>0){
+						currentThread->space->haltp();
+					}
 					DEBUG('c', "Exit, called by user.\n");
 					while(currentThread->space->nbThreads->getValue() != 0)
 						currentThread->Yield();

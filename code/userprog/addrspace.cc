@@ -19,8 +19,14 @@
 #include "system.h"
 #include "addrspace.h"
 #include "noff.h"
+#include "synch.h"
+
 
 #include <strings.h>		/* for bzero */
+
+static Semaphore *halt; //Semaphore pour que le thread main attende la fin de tout les thread
+static Semaphore *lockthread;
+
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -45,6 +51,28 @@ SwapHeader (NoffHeader * noffH)
     noffH->uninitData.inFileAddr = WordToHost (noffH->uninitData.inFileAddr);
 }
 
+
+void AddrSpace::haltv()
+{
+	halt->V();
+}
+
+void AddrSpace::haltp()
+{
+	halt->P();
+}
+
+void AddrSpace::lockthreadv()
+{
+	lockthread->V();
+}
+
+void AddrSpace::lockthreadp()
+{
+	lockthread->P();
+}
+
+
 //----------------------------------------------------------------------
 // AddrSpace::AddrSpace
 //      Create an address space to run a user program.
@@ -59,13 +87,22 @@ SwapHeader (NoffHeader * noffH)
 //
 //      "executable" is the file containing the object code to load into memory
 //----------------------------------------------------------------------
-
+//static Semaphore *halt;
 AddrSpace::AddrSpace (OpenFile * executable)
 {
+    halt = new Semaphore("halt", 0);
+    lockthread = new Semaphore("lockthread", 1);
+    semthread=new int[nbthread];
+
     NoffHeader noffH;
     unsigned int i, size;
 
-		nbThreads = new Semaphore("nbThreads", 0);
+    userthread=0;
+    tid=new int[nbthread];
+    for(int h=0;h<nbthread;h++){
+	tid[h]=-1;
+	semthread[h]=(int)new Semaphore("semthread", 0);
+    }
 
     executable->ReadAt ((char *) &noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
@@ -133,6 +170,13 @@ AddrSpace::~AddrSpace ()
 {
   // LB: Missing [] for delete
   // delete pageTable;
+  delete halt;
+  delete lockthread;
+  for(int y=0;y<<nbthread;y++){
+	delete ((Semaphore*)semthread[y]);
+  }
+  delete tid;
+  delete semthread;
   delete [] pageTable;
   // End of modification
 	delete nbThreads;
@@ -147,6 +191,8 @@ AddrSpace::~AddrSpace ()
 //      will be saved/restored into the currentThread->userRegisters
 //      when this thread is context switched out.
 //----------------------------------------------------------------------
+
+
 
 void
 AddrSpace::InitRegisters ()
