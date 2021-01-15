@@ -98,9 +98,12 @@ AddrSpace::AddrSpace (OpenFile * executable)
     unsigned int i, size;
 
     userthread=0;
+    tidMax=1;
     tid=new int[nbthread];
+    pile=new int[nbthread];
     for(int h=0;h<nbthread;h++){
-	tid[h]=-1;
+	tid[h]=0;
+	pile[h]=-1;
 	semthread[h]=(int)new Semaphore("semthread", 0);
     }
 

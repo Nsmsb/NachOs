@@ -142,6 +142,13 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_UserThreadJoin: {
+					DEBUG('c', "UserThreadJoin, called by user.\n");
+					int tid=machine->ReadRegister(4);
+					do_UserThreadJoin(tid);
+					break;
+				}
+
 				case SC_Exit: {
 					while(currentThread->space->userthread>0){
 						currentThread->space->haltp();

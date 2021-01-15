@@ -14,6 +14,7 @@
 #include "synchconsole.h"
 #include "addrspace.h"
 #include "synch.h"
+#include "userthread.h"
 
 //----------------------------------------------------------------------
 // StartProcess
@@ -44,6 +45,23 @@ void StartProcess(char *filename)
 	// the address space exits
 	// by doing the syscall "exit"
 }
+
+void teste(char *a){
+	synchconsole->SynchPutChar((char)*a);
+}
+
+void testSynchsthread (){
+
+	char a='a';
+	for (int i=0;i<5;i++){
+		do_UserThreadCreate((int)teste,(int)&a);
+		a++;
+	}
+
+}
+
+
+
 
 // Data structures needed for the console test.  Threads making
 // I/O requests wait on a Semaphore to delay until the I/O completes.

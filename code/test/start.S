@@ -193,6 +193,14 @@ GetInt:
 	j	$31
 	.end GetInt
 
+	.globl UserThreadJoin
+	.ent	UserThreadJoin
+UserThreadJoin:
+	addiu $2,$0,SC_UserThreadJoin
+	syscall
+	j	$31
+	.end UserThreadJoin
+
 
 
 /* dummy function to keep gcc happy */

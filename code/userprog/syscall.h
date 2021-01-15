@@ -37,6 +37,7 @@
 #define SC_GetInt 16
 #define SC_UserThreadCreate 17
 #define SC_UserThreadExit 18
+#define SC_UserThreadJoin 19
 
 
 
@@ -171,6 +172,10 @@ int UserThreadCreate(void f(void *arg), void *arg);
 /* Destroys an user thread.
  */
 void UserThreadExit();
+
+/*le thread appelant attent la fin du thread dont le tid est donner en paramètre*/
+
+void UserThreadJoin(int tid);
 
 #endif // IN_USER_MODE
 
