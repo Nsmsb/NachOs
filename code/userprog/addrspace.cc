@@ -175,7 +175,7 @@ AddrSpace::~AddrSpace ()
   // delete pageTable;
   delete halt;
   delete lockthread;
-  for(int y=0;y<<nbthread;y++){
+  for(int y=0;y<nbthread;y++){
 	delete ((Semaphore*)semthread[y]);
   }
   delete tid;
