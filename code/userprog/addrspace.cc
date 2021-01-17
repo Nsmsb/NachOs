@@ -77,8 +77,15 @@ static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, 
 	char temp_buffer[numBytes];
 	int read_bytes = executable->ReadAt(temp_buffer, numBytes, position);
 
+	// setting pageTable, it is null at first, we have to set it
+	machine->pageTable = pageTable;
+	machine->pageTableSize = numPages;
+
 	for (int i = 0; i < read_bytes; i++)
-		machine->WriteMem(virtualaddr+i, 1, temp_buffer[i]);	
+		machine->WriteMem(virtualaddr+i, 1, temp_buffer[i]);
+	
+	// machine->pageTable = null;
+	// machine->pageTableSize = null;
 }
 
 //----------------------------------------------------------------------
@@ -159,7 +166,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	  DEBUG ('a', "Initializing code segment, at 0x%x, size %d\n",
 		 noffH.code.virtualAddr, noffH.code.size);
 	//   executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
-	  ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.code.size, noffH.code.inFileAddr, pageTable, numPages);
+	ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr, pageTable, numPages);
       }
     if (noffH.initData.size > 0)
 	{
