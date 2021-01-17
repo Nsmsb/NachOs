@@ -72,6 +72,14 @@ void AddrSpace::lockthreadp()
 	lockthread->P();
 }
 
+static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages)
+{
+	char temp_buffer[numBytes];
+	int read_bytes = executable->ReadAt(temp_buffer, numBytes, position);
+
+	for (int i = 0; i < read_bytes; i++)
+		machine->WriteMem(virtualaddr+i, 1, temp_buffer[i]);	
+}
 
 //----------------------------------------------------------------------
 // AddrSpace::AddrSpace
@@ -92,7 +100,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 {
     halt = new Semaphore("halt", 0);
     lockthread = new Semaphore("lockthread", 1);
-    semthread=new int[nbthread];
+    semthread= new int[nbthread];
 
     NoffHeader noffH;
     unsigned int i, size;
@@ -107,6 +115,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	semthread[h]=(int)new Semaphore("semthread", 0);
     }
 
+	// we won't change it here, it deosn't write to machine memory
     executable->ReadAt ((char *) &noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
 	(WordToHost (noffH.noffMagic) == NOFFMAGIC))
@@ -149,19 +158,16 @@ AddrSpace::AddrSpace (OpenFile * executable)
       {
 	  DEBUG ('a', "Initializing code segment, at 0x%x, size %d\n",
 		 noffH.code.virtualAddr, noffH.code.size);
-	  executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]),
-			      noffH.code.size, noffH.code.inFileAddr);
+	//   executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
+	  ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.code.size, noffH.code.inFileAddr, pageTable, numPages);
       }
     if (noffH.initData.size > 0)
-      {
-	  DEBUG ('a', "Initializing data segment, at 0x%x, size %d\n",
-		 noffH.initData.virtualAddr, noffH.initData.size);
-	  executable->ReadAt (&
-			      (machine->mainMemory
-			       [noffH.initData.virtualAddr]),
-			      noffH.initData.size, noffH.initData.inFileAddr);
-      }
-
+	{
+		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n",
+			  noffH.initData.virtualAddr, noffH.initData.size);
+		// executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]), noffH.initData.size, noffH.initData.inFileAddr);
+		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr, pageTable, numPages);
+	}
 }
 
 //----------------------------------------------------------------------
