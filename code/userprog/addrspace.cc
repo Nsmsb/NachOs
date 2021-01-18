@@ -72,6 +72,22 @@ void AddrSpace::lockthreadp()
 	lockthread->P();
 }
 
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
+													int position, TranslationEntry *pageTable, unsigned numPages){
+
+	char buffer[numBytes];
+	int read = executable->ReadAt(buffer, numBytes, position);
+
+
+
+	machine->pageTable = pageTable;
+	machine->pageTableSize = numPages;
+
+	for(int i = 0 ; i < read ; i++){
+		machine->WriteMem(virtualaddr + i, 1, buffer[i])
+	}
+
+}
 
 //----------------------------------------------------------------------
 // AddrSpace::AddrSpace
