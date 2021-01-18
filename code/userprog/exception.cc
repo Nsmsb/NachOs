@@ -155,7 +155,7 @@ ExceptionHandler (ExceptionType which)
 				case SC_ForkExec: {
 					DEBUG('c', "ForkExec : arg1 = %d\n", machine->ReadRegister(4));
 					int val;
-					char filename[MAX_STRING_SIZE];
+					char *filename = new char[MAX_STRING_SIZE];
 					synchconsole->copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);
 					val = do_ForkExec(filename);
 					machine->WriteRegister(2, val);
