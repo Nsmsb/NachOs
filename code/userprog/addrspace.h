@@ -17,7 +17,7 @@
 #include "filesys.h"
 #include "translate.h"
 
-#define UserStackSize		1024	// increase this as necessary!
+#define UserStackSize		3072	// increase this as necessary!
 
 #define nbthread (UserStackSize)/(2*(PageSize))
 
