@@ -80,7 +80,6 @@ static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, 
 	// saving prev PageTable/numsPages
 	TranslationEntry *prev_pageTable = machine->pageTable;
 	int prev_numPages = machine->pageTableSize;
-	
 	// setting pageTable, (we have to set at least one mode pagination or TLB)
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
@@ -200,6 +199,7 @@ AddrSpace::~AddrSpace ()
   delete semthread;
   delete [] pageTable;
   // End of modification
+	delete nbThreads;
 }
 
 //----------------------------------------------------------------------

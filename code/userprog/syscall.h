@@ -38,7 +38,7 @@
 #define SC_UserThreadCreate 17
 #define SC_UserThreadExit 18
 #define SC_UserThreadJoin 19
-
+#define SC_ForkExec	20
 
 
 #ifdef IN_USER_MODE
@@ -174,8 +174,12 @@ int UserThreadCreate(void f(void *arg), void *arg);
 void UserThreadExit();
 
 /*le thread appelant attent la fin du thread dont le tid est donner en paramètre*/
-
 void UserThreadJoin(int tid);
+
+/* Creates a new processus that executes the fil
+ * given as argument.
+ */
+int ForkExec(char *s);
 
 #endif // IN_USER_MODE
 
