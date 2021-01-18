@@ -80,7 +80,6 @@ static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, 
 	// saving prev PageTable/numsPages
 	TranslationEntry *prev_pageTable = machine->pageTable;
 	int prev_numPages = machine->pageTableSize;
-
 	// setting pageTable, (we have to set at least one mode pagination or TLB)
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
@@ -152,7 +151,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
     for (i = 0; i < numPages; i++)
       {
 	  pageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
-	  pageTable[i].physicalPage = i;
+	  pageTable[i].physicalPage = i+1;
 	  pageTable[i].valid = TRUE;
 	  pageTable[i].use = FALSE;
 	  pageTable[i].dirty = FALSE;
