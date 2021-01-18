@@ -78,7 +78,8 @@ static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
 	char buffer[numBytes];
 	int read = executable->ReadAt(buffer, numBytes, position);
 
-
+	TranslationEntry *tmpTable = machine->pageTable;
+	unsigned tmpNum = machine->pageTableSize;
 
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
@@ -86,6 +87,9 @@ static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
 	for(int i = 0 ; i < read ; i++){
 		machine->WriteMem(virtualaddr + i, 1, buffer[i])
 	}
+
+	machine->pageTable = tmpTable;
+	machine->pageTableSize = tmpNum;
 
 }
 
