@@ -37,6 +37,7 @@
 #define SC_GetInt 16
 #define SC_UserThreadCreate 17
 #define SC_UserThreadExit 18
+#define SC_ForkExec	19
 
 
 
@@ -171,6 +172,11 @@ int UserThreadCreate(void f(void *arg), void *arg);
 /* Destroys an user thread.
  */
 void UserThreadExit();
+
+/* Creates a new processus that executes the fil
+ * given as argument.
+ */
+int ForkExec(char *s);
 
 #endif // IN_USER_MODE
 
