@@ -72,25 +72,25 @@ void AddrSpace::lockthreadp()
 	lockthread->P();
 }
 
-static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes,
-													int position, TranslationEntry *pageTable, unsigned numPages){
+static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages)
+{
+	char temp_buffer[numBytes];
+	int read_bytes = executable->ReadAt(temp_buffer, numBytes, position);
 
-	char buffer[numBytes];
-	int read = executable->ReadAt(buffer, numBytes, position);
+	// saving prev PageTable/numsPages
+	TranslationEntry *prev_pageTable = machine->pageTable;
+	int prev_numPages = machine->pageTableSize;
 
-	TranslationEntry *tmpTable = machine->pageTable;
-	unsigned tmpNum = machine->pageTableSize;
-
+	// setting pageTable, (we have to set at least one mode pagination or TLB)
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
 
-	for(int i = 0 ; i < read ; i++){
-		machine->WriteMem(virtualaddr + i, 1, buffer[i])
-	}
-
-	machine->pageTable = tmpTable;
-	machine->pageTableSize = tmpNum;
-
+	for (int i = 0; i < read_bytes; i++)
+		machine->WriteMem(virtualaddr+i, 1, temp_buffer[i]);
+	
+	// restoring prev pageTable (it may not be neccessary because at each call we set the pageTable/numPages)
+	machine->pageTable = prev_pageTable;
+	machine->pageTableSize = prev_numPages;
 }
 
 //----------------------------------------------------------------------
@@ -112,18 +112,22 @@ AddrSpace::AddrSpace (OpenFile * executable)
 {
     halt = new Semaphore("halt", 0);
     lockthread = new Semaphore("lockthread", 1);
-    semthread=new int[nbthread];
+    semthread= new int[nbthread];
 
     NoffHeader noffH;
     unsigned int i, size;
 
     userthread=0;
+    tidMax=1;
     tid=new int[nbthread];
+    pile=new int[nbthread];
     for(int h=0;h<nbthread;h++){
-	tid[h]=-1;
+	tid[h]=0;
+	pile[h]=-1;
 	semthread[h]=(int)new Semaphore("semthread", 0);
     }
 
+	// we won't change it here, it deosn't write to machine memory
     executable->ReadAt ((char *) &noffH, sizeof (noffH), 0);
     if ((noffH.noffMagic != NOFFMAGIC) &&
 	(WordToHost (noffH.noffMagic) == NOFFMAGIC))
@@ -166,19 +170,16 @@ AddrSpace::AddrSpace (OpenFile * executable)
       {
 	  DEBUG ('a', "Initializing code segment, at 0x%x, size %d\n",
 		 noffH.code.virtualAddr, noffH.code.size);
-	  executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]),
-			      noffH.code.size, noffH.code.inFileAddr);
+	//   executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
+	ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr, pageTable, numPages);
       }
     if (noffH.initData.size > 0)
-      {
-	  DEBUG ('a', "Initializing data segment, at 0x%x, size %d\n",
-		 noffH.initData.virtualAddr, noffH.initData.size);
-	  executable->ReadAt (&
-			      (machine->mainMemory
-			       [noffH.initData.virtualAddr]),
-			      noffH.initData.size, noffH.initData.inFileAddr);
-      }
-
+	{
+		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n",
+			  noffH.initData.virtualAddr, noffH.initData.size);
+		// executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]), noffH.initData.size, noffH.initData.inFileAddr);
+		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr, pageTable, numPages);
+	}
 }
 
 //----------------------------------------------------------------------
@@ -192,7 +193,7 @@ AddrSpace::~AddrSpace ()
   // delete pageTable;
   delete halt;
   delete lockthread;
-  for(int y=0;y<<nbthread;y++){
+  for(int y=0;y<nbthread;y++){
 	delete ((Semaphore*)semthread[y]);
   }
   delete tid;

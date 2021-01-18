@@ -9,8 +9,6 @@ void teste(void *a){
 
 	PutChar(*(char*)a);
 	PutChar('\n');
-	/*PutChar('a');
-	PutChar('\n');*/
 	UserThreadExit();
 
 }

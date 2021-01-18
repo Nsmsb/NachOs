@@ -17,8 +17,6 @@
 #ifndef SYNCH_H
 #define SYNCH_H
 
-#define nbthread 5
-
 #include "copyright.h"
 #include "thread.h"
 #include "list.h"

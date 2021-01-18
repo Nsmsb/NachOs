@@ -10,7 +10,9 @@
 
 void do_UserThreadExit();
 
-void UserThreadJoin(int tid);
+void do_UserThreadJoin(int tid);
+
+int cherchepospile(int tid);
 
 extern int do_UserThreadCreate(int f, int arg);
 

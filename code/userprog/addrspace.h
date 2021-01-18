@@ -20,6 +20,7 @@
 #define UserStackSize		1024	// increase this as necessary!
 
 class Semaphore;
+#define nbthread (UserStackSize)/(2*(PageSize))
 
 class AddrSpace
 {
@@ -42,8 +43,12 @@ class AddrSpace
     void SaveState ();		// Save/restore address space-specific
     void RestoreState ();	// info on a context switch 
     int userthread;
-    int *tid;			//tableaux indiquant quelle tid est libre pour les nouveaux thread
-				//et si le thread est attendu
+    int tidMax;			//le prochain numéros de tid a donner
+    int *tid;			//tableaux indiquant que le thread a l'indice i du tabeaux est  
+				//attendu par tid[i] thread 
+    int *pile;			//tableaux indiquant quelle espace de la pile pouvant acueillire un
+				//thread est libre valeur -1 et le tid du thread occupant la zone
+				//de la pile correspondant
     int *semthread;		//tableaux de Semaphore * convertie en int,chaque Semaphore est
  				//relier a un tid
 
@@ -56,7 +61,5 @@ class AddrSpace
     unsigned int numPages;	// Number of pages in the virtual 
     // address space
 };
-
-
 
 #endif // ADDRSPACE_H

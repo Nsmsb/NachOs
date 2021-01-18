@@ -26,6 +26,7 @@
 #include "system.h"
 #include "syscall.h"
 #include "userthread.h"
+#include "userprocess.h"
 
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
@@ -144,11 +145,18 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_UserThreadJoin: {
+					DEBUG('c', "UserThreadJoin, called by user.\n");
+					int tid=machine->ReadRegister(4);
+					do_UserThreadJoin(tid);
+					break;
+				}
+
 				case SC_ForkExec: {
 					DEBUG('c', "ForkExec : arg1 = %d\n", machine->ReadRegister(4));
 					int val;
-					char *filename;
-					copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);
+					char filename[MAX_STRING_SIZE];
+					synchconsole->copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);
 					val = do_ForkExec(filename);
 					machine->WriteRegister(2, val);
 					break;
