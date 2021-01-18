@@ -77,15 +77,20 @@ static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, 
 	char temp_buffer[numBytes];
 	int read_bytes = executable->ReadAt(temp_buffer, numBytes, position);
 
-	// setting pageTable, it is null at first, we have to set it
+	// saving prev PageTable/numsPages
+	// TranslationEntry *prev_pageTable = machine->pageTable;
+	// int prev_numPages = machine->pageTableSize;
+
+	// setting pageTable, (we have to set at least one mode pagination or TLB)
 	machine->pageTable = pageTable;
 	machine->pageTableSize = numPages;
 
 	for (int i = 0; i < read_bytes; i++)
 		machine->WriteMem(virtualaddr+i, 1, temp_buffer[i]);
 	
-	// machine->pageTable = null;
-	// machine->pageTableSize = null;
+	// restoring prev pageTable (it may not be neccessary because at each call we set the pageTable/numPages)
+	// machine->pageTable = prev_pageTable;
+	// machine->pageTableSize = prev_numPages;
 }
 
 //----------------------------------------------------------------------
