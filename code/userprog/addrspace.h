@@ -19,6 +19,7 @@
 
 #define UserStackSize		3072	// increase this as necessary!
 
+class Semaphore;
 #define nbthread (UserStackSize)/(2*(PageSize))
 
 class AddrSpace
@@ -51,6 +52,8 @@ class AddrSpace
     int *semthread;		//tableaux de Semaphore * convertie en int,chaque Semaphore est
  				//relier a un tid
 
+
+		Semaphore *nbThreads;
 
   private:
       TranslationEntry * pageTable;	// Assume linear page table translation

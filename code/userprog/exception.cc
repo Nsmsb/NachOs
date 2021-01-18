@@ -1,3 +1,4 @@
+
 // exception.cc 
 //      Entry point into the Nachos kernel from user programs.
 //      There are two kinds of things that can cause control to
@@ -25,6 +26,7 @@
 #include "system.h"
 #include "syscall.h"
 #include "userthread.h"
+#include "userprocess.h"
 
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
@@ -124,6 +126,7 @@ ExceptionHandler (ExceptionType which)
 				}
 
 				case SC_UserThreadExit: {
+					DEBUG('c', "UserThreadExit.\n");
 					do_UserThreadExit();
 					break;
 				}
@@ -149,11 +152,22 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_ForkExec: {
+					DEBUG('c', "ForkExec : arg1 = %d\n", machine->ReadRegister(4));
+					int val;
+					char *filename = new char[MAX_STRING_SIZE];
+					synchconsole->copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);
+					val = do_ForkExec(filename);
+					machine->WriteRegister(2, val);
+					break;
+				}
+
 				case SC_Exit: {
 					while(currentThread->space->userthread>0){
 						currentThread->space->haltp();
 					}
-					DEBUG('c', "Exit, called by user.\n");
+
+					DEBUG('c', "Exit : All threads terminated. Main is now ending.\n");
 					interrupt->Exit(machine->ReadRegister(4));
 					break;
 				}
