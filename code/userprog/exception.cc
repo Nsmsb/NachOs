@@ -1,3 +1,4 @@
+
 // exception.cc 
 //      Entry point into the Nachos kernel from user programs.
 //      There are two kinds of things that can cause control to
@@ -147,9 +148,6 @@ ExceptionHandler (ExceptionType which)
 					while(currentThread->space->userthread>0){
 						currentThread->space->haltp();
 					}
-					DEBUG('c', "Exit, called by user.\n");
-					while(currentThread->space->nbThreads->getValue() != 0)
-						currentThread->Yield();
 
 					DEBUG('c', "Exit : All threads terminated. Main is now ending.\n");
 					interrupt->Exit(machine->ReadRegister(4));
