@@ -208,12 +208,12 @@ AddrSpace::~AddrSpace ()
   delete nbThreads;
   
   // realising frames
-//   int frame_index;
-//   for (int i = 0; i < numPages; i++)
-//   {
-// 	  frame_index = pageTable[i].physicalPage;
-// 	  frameProvider->ReleaseFrame(frame_index);
-//   }
+  int frame_index;
+  for (int i = 0; i < (int)numPages; i++)
+  {
+	  frame_index = pageTable[i].physicalPage;
+	  frameProvider->ReleaseFrame(frame_index);
+  }
   
 }
 
