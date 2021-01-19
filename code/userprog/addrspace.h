@@ -53,7 +53,7 @@ class AddrSpace
  				//relier a un tid
 
 
-		Semaphore *nbThreads;
+	Semaphore *nbThreads;
 
   private:
       TranslationEntry * pageTable;	// Assume linear page table translation
