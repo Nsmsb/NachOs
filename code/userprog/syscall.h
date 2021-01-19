@@ -167,7 +167,7 @@ void GetInt(int* val);
 /* Creates an user thread that will execute f with arg.
  * Returns -1 on failure.
  */
-int UserThreadCreate(void f(void *arg), void *arg);
+int UserThreadCreate(void f(void *arg), void *arg,int retour);
 
 /* Destroys an user thread.
  */

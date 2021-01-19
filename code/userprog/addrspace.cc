@@ -196,10 +196,10 @@ AddrSpace::~AddrSpace ()
 	delete ((Semaphore*)semthread[y]);
   }
   delete tid;
+  delete pile;
   delete semthread;
   delete [] pageTable;
   // End of modification
-	delete nbThreads;
 }
 
 //----------------------------------------------------------------------

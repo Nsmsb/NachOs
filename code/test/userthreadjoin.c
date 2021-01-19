@@ -23,7 +23,7 @@ int main(){
 	char a='a';
 	int tid;
 	for (int i=0;i<24;i++){
-		tid=UserThreadCreate(teste,(void *)&a);
+		tid=UserThreadCreate(teste,(void *)&a,(int)UserThreadExit);
 		UserThreadJoin(tid);
 		a++;
 	}	

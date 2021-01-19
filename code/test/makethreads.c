@@ -17,7 +17,7 @@ void print(void *val){
 
 int main(){
 	char val = 'a';
-	UserThreadCreate(print, ((void *) &val));
+	UserThreadCreate(print, ((void *) &val),(int)UserThreadExit);
 	GetChar();
 
 	return 0;

@@ -14,6 +14,7 @@
 static void StartUserThread(int f){
 
 	int p,*a=(int*)f,pospile=a[2];
+	int *arg=(int*)a[1];
 
 	currentThread->tid=currentThread->space->pile[pospile];
 	currentThread->space->InitRegisters();
@@ -23,13 +24,13 @@ static void StartUserThread(int f){
 
 	p=machine->ReadRegister(StackReg);
 	
-	machine->WriteRegister (4,a[1]);
+	machine->WriteRegister (4,arg[0]);
 	
 	machine->WriteRegister (StackReg,p-2*(pospile+1)*PageSize);
 
 	machine->WriteRegister (PCReg,a[0]);
 	machine->WriteRegister (NextPCReg,a[0]+4);
-
+	machine->WriteRegister (RetAddrReg,arg[1]);
 
 	delete a;
 

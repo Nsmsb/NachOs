@@ -15,7 +15,7 @@ void f(void *s){
 
 int main()
 {
-	int tid = UserThreadCreate(f, (void *) THIS);
+	int tid = UserThreadCreate(f, (void *) THIS,(int)UserThreadExit);
 
 	for(int i = 100 ; i < N+100 ; i++)
 		PutInt(i);

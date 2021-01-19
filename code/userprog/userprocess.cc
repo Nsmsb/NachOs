@@ -6,6 +6,7 @@
 
 static void StartUserProcess(int arg){
 	char *filename = (char *) arg;
+	nbProcess++;
 	DEBUG('c', "Filename after cast = %s\n", filename);
 	OpenFile *executable = fileSystem->Open (filename);
 	AddrSpace *space;
@@ -13,6 +14,7 @@ static void StartUserProcess(int arg){
 	if (executable == NULL)
 	{
 		printf ("Unable to open file %s\n", filename);
+		nbProcess--;
 		return;
 	}
 	space = new AddrSpace (executable);

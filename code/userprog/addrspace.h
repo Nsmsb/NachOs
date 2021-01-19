@@ -42,7 +42,7 @@ class AddrSpace
 
     void SaveState ();		// Save/restore address space-specific
     void RestoreState ();	// info on a context switch 
-    int userthread;
+    int userthread;		// nombre de thread du pocessus
     int tidMax;			//le prochain numéros de tid a donner
     int *tid;			//tableaux indiquant que le thread a l'indice i du tabeaux est  
 				//attendu par tid[i] thread 

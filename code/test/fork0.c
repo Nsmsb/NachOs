@@ -20,7 +20,7 @@ void f(void *s){
 
 int main()
 {
-	int tid = UserThreadCreate(f, (void *) THIS);
+	int tid = UserThreadCreate(f, (void *) THIS,(int)UserThreadExit);
 
 	char *p;
 	char *s = (char *) THAT;

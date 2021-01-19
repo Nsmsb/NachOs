@@ -186,6 +186,7 @@ Cleanup ()
 {
 
     if(nbProcess>1){
+	nbProcess--;
 	currentThread->Finish();
     }
 
