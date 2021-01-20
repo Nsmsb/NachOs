@@ -11,6 +11,7 @@
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
+int nbProcess;
 Thread *currentThread;		// the thread we are running now
 Thread *threadToBeDestroyed;	// the thread that just finished
 Scheduler *scheduler;		// the ready list
@@ -40,6 +41,7 @@ PostOffice *postOffice;
 
 // External definition, to allow us to take a pointer to this function
 extern void Cleanup ();
+extern void do_UserThreadExit();
 
 
 //----------------------------------------------------------------------
@@ -79,6 +81,7 @@ TimerInterruptHandler (int dummy)
 void
 Initialize (int argc, char **argv)
 {
+    nbProcess=1;
     int argCount;
     const char *debugArgs = "";
     bool randomYield = FALSE;
@@ -191,7 +194,7 @@ Cleanup ()
 
 #ifdef USER_PROGRAM
     delete machine;
-		delete synchconsole;
+    delete synchconsole;
 #endif
 
 #ifdef FILESYS_NEEDED
@@ -208,3 +211,8 @@ Cleanup ()
 
     Exit (0);
 }
+
+
+
+
+

@@ -17,7 +17,7 @@
 #include "filesys.h"
 #include "translate.h"
 
-#define UserStackSize		1024	// increase this as necessary!
+#define UserStackSize		3072	// increase this as necessary!
 
 class Semaphore;
 #define nbthread (UserStackSize)/(2*(PageSize))
@@ -42,7 +42,7 @@ class AddrSpace
 
     void SaveState ();		// Save/restore address space-specific
     void RestoreState ();	// info on a context switch 
-    int userthread;
+    int userthread;		// nombre de thread du pocessus
     int tidMax;			//le prochain numéros de tid a donner
     int *tid;			//tableaux indiquant que le thread a l'indice i du tabeaux est  
 				//attendu par tid[i] thread 

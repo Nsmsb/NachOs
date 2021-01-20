@@ -202,10 +202,10 @@ AddrSpace::~AddrSpace ()
 	delete ((Semaphore*)semthread[y]);
   }
   delete tid;
+  delete pile;
   delete semthread;
   delete [] pageTable;
   // End of modification
-  delete nbThreads;
   
   // realising frames
   int frame_index;
@@ -263,6 +263,7 @@ AddrSpace::InitRegisters ()
 void
 AddrSpace::SaveState ()
 {
+
 }
 
 //----------------------------------------------------------------------

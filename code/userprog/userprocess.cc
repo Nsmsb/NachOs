@@ -13,6 +13,7 @@ static void StartUserProcess(int arg){
 	if (executable == NULL)
 	{
 		printf ("Unable to open file %s\n", filename);
+		nbProcess--;
 		return;
 	}
 	space = new AddrSpace (executable);
@@ -26,6 +27,7 @@ static void StartUserProcess(int arg){
 	delete filename;
 
 	DEBUG('t', "%s has address space at %d\n", currentThread->getName(), currentThread->space);
+	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space);
 
 	machine->Run ();		// jump to the user progam
 	ASSERT (FALSE);		// machine->Run never returns

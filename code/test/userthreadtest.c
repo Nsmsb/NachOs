@@ -7,28 +7,52 @@
 
 void teste(void *a){
 
-	PutChar(*(char*)a);
+	int i=0;
+	char c='i';
+	while(c!='\0'){
+		c=((char*)a)[i];
+		PutChar(c);
+		i++;
+	}
 	PutChar('\n');
-	UserThreadExit();
 
 }
 
+void testec(void *a){
+
+	PutChar('\n');
+	PutChar(*(char*)a);
+	PutChar('\n');
+
+
+}
+
+void testei(void *a){
+
+	PutChar('\n');
+	PutInt(*(int*)a);
+	PutChar('\n');
+
+
+}
 
 int main (){
 
-	char a='a';
-	UserThreadCreate(teste,(void *)&a);
-	char i=a+1;
-	UserThreadCreate(teste,(void *)&i);
-	char r=i+1;
-	UserThreadCreate(teste,(void *)&r);
-	char p=r+1;
-	UserThreadCreate(teste,(void *)&p);
-	char t=p+1;
-	UserThreadCreate(teste,(void *)&t);
-	char y=t+1;
-	UserThreadCreate(teste,(void *)&y);
-	/*char o=y+1;
-	UserThreadCreate(teste,(void *)&o);*/
+	char a[3];
+	a[0]='a';
+	a[1]='b';
+	a[2]='\0';
+	UserThreadCreate(teste,(void *)a,(int)UserThreadExit);
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+

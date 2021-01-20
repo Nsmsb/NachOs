@@ -10,21 +10,21 @@ void f(void *s){
 	for(i = 0 ; i < N ; i++)
 		PutInt(i);
 
-	UserThreadExit();
+	//UserThreadExit();
 }
 
 int main()
 {
-	int tid = UserThreadCreate(f, (void *) THIS);
+	int tid = UserThreadCreate(f, (void *) THIS,(int)UserThreadExit);
 
 	//for(int i = 100 ; i < N+100 ; i++)
 	//	PutInt(i);
 
 	UserThreadJoin(tid);
 
-	while(1){
+	/*while(1){
 		tid++;
-	}
+	}*/
 
 	return 0;
 }

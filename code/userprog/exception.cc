@@ -120,7 +120,10 @@ ExceptionHandler (ExceptionType which)
 				case SC_UserThreadCreate: {
 					DEBUG('c', "UserThreadCreate : arg1 = %d, arg2 = %d\n", machine->ReadRegister(4), machine->ReadRegister(5));
 					int val;
-					val = do_UserThreadCreate(machine->ReadRegister(4), machine->ReadRegister(5));
+					int *i=new int[2];
+					i[0]=machine->ReadRegister(5);
+					i[1]=machine->ReadRegister(6);
+					val = do_UserThreadCreate(machine->ReadRegister(4),(int)i);
 					machine->WriteRegister(2, val);
 					break;
 				}
@@ -154,6 +157,7 @@ ExceptionHandler (ExceptionType which)
 
 				case SC_ForkExec: {
 					DEBUG('c', "ForkExec : arg1 = %d\n", machine->ReadRegister(4));
+					nbProcess++;
 					int val;
 					char *filename = new char[MAX_STRING_SIZE];
 					synchconsole->copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);

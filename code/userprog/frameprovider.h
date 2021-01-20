@@ -2,8 +2,7 @@
 
 class FrameProvider
 {
-private:
-	BitMap *pageFrames;
+
 
 public:
 	FrameProvider(int numPages);
@@ -17,4 +16,7 @@ public:
 
 	// return number of available Frames
 	int NumAvailFrame();
+
+  private:
+	BitMap *pageFrames;
 };

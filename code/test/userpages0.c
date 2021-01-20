@@ -14,8 +14,8 @@ int main(){
 	int tid1, tid2;
 	char c1 = 'a', c2 = 'b';
 
-	tid1 = UserThreadCreate((void (*)(void *))user_pages_thread,(void *)(&c1));
-	tid2 = UserThreadCreate((void (*)(void *))user_pages_thread,(void *)(&c2));
+	tid1 = UserThreadCreate((void (*)(void *))user_pages_thread,(void *)(&c1),(int)UserThreadExit);
+	tid2 = UserThreadCreate((void (*)(void *))user_pages_thread,(void *)(&c2),(int)UserThreadExit);
 	UserThreadJoin(tid1);
 	UserThreadJoin(tid2);
 	PutString("TERMINATED.\n");
