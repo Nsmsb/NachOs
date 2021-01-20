@@ -116,8 +116,11 @@ int do_UserThreadCreate(int f, int arg){
 	currentThread->space->pile[j]=tiduse;
 	currentThread->space->tidMax++;
 	currentThread->space->lockthreadv();
+
 	i[2]=j;
-	Thread *t = new Thread("UserThread");
+	char *name = new char [MAX_STRING_SIZE];
+	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserThread", tiduse);
+	Thread *t = new Thread(name);
 	t->Fork (StartUserThread,(int)i);
 
 	return  tiduse;

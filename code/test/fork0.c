@@ -1,6 +1,6 @@
 #include "syscall.h"
 #define THIS "aaa"
-#define THAT "bbb"
+#define THAT "fff\0"
 
 const int N = 10;
 
@@ -22,6 +22,7 @@ int main()
 {
 	int tid = UserThreadCreate(f, (void *) THIS,(int)UserThreadExit);
 
+/*
 	char *p;
 	char *s = (char *) THAT;
 
@@ -30,7 +31,7 @@ int main()
 			PutChar(*p);
 		}
 	}
-
+*/
 	UserThreadJoin(tid);
 	while(1){
 		tid++;

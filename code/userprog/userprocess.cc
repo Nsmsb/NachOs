@@ -27,18 +27,24 @@ static void StartUserProcess(int arg){
 	
 	delete filename;
 
+	DEBUG('t', "%s has address space at %d\n", currentThread->getName(), currentThread->space);
+	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space
+
 	machine->Run ();		// jump to the user progam
 	ASSERT (FALSE);		// machine->Run never returns
 
 }
 
 extern int do_ForkExec(char *filename){
-	int pid = 1;
+	int pid = pidMax;
+	pidMax++;
 
 	DEBUG('c', "Filename = %s\n", filename);
 
 	int arg = (int) filename;
-	Thread *trd = new Thread("UserProcessus");
+	char *name = new char [MAX_STRING_SIZE];
+	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserProcessus", pid);
+	Thread *trd = new Thread(name);
 	trd->Fork(StartUserProcess, arg);
 
 	return pid;

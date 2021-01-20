@@ -31,6 +31,7 @@ SynchDisk *synchDisk;
 #ifdef USER_PROGRAM		// requires either FILESYS or FILESYS_STUB
 Machine *machine;		// user program memory and registers
 SynchConsole *synchconsole;
+int pidMax;
 #endif
 
 #ifdef NETWORK
@@ -87,6 +88,7 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
+		pidMax = 1;
 #endif
 #ifdef FILESYS_NEEDED
     bool format = FALSE;	// format disk

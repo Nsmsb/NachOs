@@ -36,6 +36,7 @@ extern int nbProcess;
 #define MAX_STRING_SIZE 100
 extern Machine *machine;	// user program memory and registers
 extern SynchConsole *synchconsole;
+extern int pidMax;
 #endif
 
 #ifdef FILESYS_NEEDED		// FILESYS or FILESYS_STUB
