@@ -15,7 +15,7 @@ void f(void *s){
 	for(i = 0 ; i < N ; i++)
 		puts((char *)s);
 
-	UserThreadExit();
+	//UserThreadExit();
 }
 
 int main()
@@ -33,9 +33,9 @@ int main()
 	}
 */
 	UserThreadJoin(tid);
-	while(1){
+	/*while(1){
 		tid++;
-	}
+	}*/
 
 	return 0;
 }

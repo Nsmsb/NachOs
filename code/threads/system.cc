@@ -186,12 +186,6 @@ Initialize (int argc, char **argv)
 void
 Cleanup ()
 {
-
-    if(nbProcess>1){
-	nbProcess--;
-	currentThread->Finish();
-    }
-
     printf ("\nCleaning up...\n");
 #ifdef NETWORK
     delete postOffice;

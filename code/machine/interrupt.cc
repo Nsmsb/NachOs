@@ -243,6 +243,7 @@ Interrupt::Idle()
 void
 Interrupt::Halt()
 {
+
     printf("Machine halting!\n\n");
     stats->Print();
     Cleanup();     // Never returns.
@@ -268,7 +269,10 @@ Interrupt::Exit(int value)
 				break;
 			}
 		}
-		
+		nbProcess--;
+    		if(nbProcess>0){
+			Exit (0);
+   		}
 		Cleanup();
 
 }

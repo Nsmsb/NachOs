@@ -6,7 +6,6 @@
 
 static void StartUserProcess(int arg){
 	char *filename = (char *) arg;
-	nbProcess++;
 	DEBUG('c', "Filename after cast = %s\n", filename);
 	OpenFile *executable = fileSystem->Open (filename);
 	AddrSpace *space;
@@ -28,7 +27,7 @@ static void StartUserProcess(int arg){
 	delete filename;
 
 	DEBUG('t', "%s has address space at %d\n", currentThread->getName(), currentThread->space);
-	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space
+	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space);
 
 	machine->Run ();		// jump to the user progam
 	ASSERT (FALSE);		// machine->Run never returns
