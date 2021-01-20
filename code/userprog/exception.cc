@@ -172,6 +172,10 @@ ExceptionHandler (ExceptionType which)
 					}
 
 					DEBUG('c', "Exit : All threads terminated. Main is now ending.\n");
+					nbProcess--;
+					if(nbProcess>0){
+						currentThread->Finish();
+					}
 					interrupt->Exit(machine->ReadRegister(4));
 					break;
 				}

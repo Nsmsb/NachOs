@@ -269,9 +269,8 @@ Interrupt::Exit(int value)
 				break;
 			}
 		}
-		nbProcess--;
     		if(nbProcess>0){
-			Exit (0);
+			printf("lalalala\n");
    		}
 		Cleanup();
 
