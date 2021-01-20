@@ -160,6 +160,7 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
+		bzero(machine->mainMemory, size);
 		synchconsole = new SynchConsole(NULL, NULL);
 #endif
 

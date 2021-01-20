@@ -1,6 +1,6 @@
 #include "syscall.h"
 #define THIS "aaa"
-#define THAT "fff\0"
+#define THAT "fff"
 
 const int N = 10;
 
