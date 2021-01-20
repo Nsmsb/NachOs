@@ -20,12 +20,15 @@
 #include "addrspace.h"
 #include "noff.h"
 #include "synch.h"
-
+#include "frameprovider.h"
 
 #include <strings.h>		/* for bzero */
 
 static Semaphore *halt; //Semaphore pour que le thread main attende la fin de tout les thread
 static Semaphore *lockthread;
+
+// frame provider
+static FrameProvider *frameProvider = new FrameProvider((int)(NumPhysPages));;
 
 
 //----------------------------------------------------------------------
@@ -112,6 +115,8 @@ AddrSpace::AddrSpace (OpenFile * executable)
     halt = new Semaphore("halt", 0);
     lockthread = new Semaphore("lockthread", 1);
     semthread= new int[nbthread];
+	// if (!frameProvider)
+		// frameProvider = new FrameProvider((int)(NumPhysPages));
 
     NoffHeader noffH;
     unsigned int i, size;
@@ -147,11 +152,12 @@ AddrSpace::AddrSpace (OpenFile * executable)
     DEBUG ('a', "Initializing address space, num pages %d, size %d\n",
 	   numPages, size);
 // first, set up the translation 
-    pageTable = new TranslationEntry[numPages];
+    pageTable = new TranslationEntry[NumPhysPages];
     for (i = 0; i < numPages; i++)
       {
 	  pageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
-	  pageTable[i].physicalPage = i+1;
+	//   pageTable[i].physicalPage = i+1;
+	  pageTable[i].physicalPage = frameProvider->GetEmptyFrame();
 	  pageTable[i].valid = TRUE;
 	  pageTable[i].use = FALSE;
 	  pageTable[i].dirty = FALSE;
@@ -199,7 +205,16 @@ AddrSpace::~AddrSpace ()
   delete semthread;
   delete [] pageTable;
   // End of modification
-	delete nbThreads;
+  delete nbThreads;
+  
+  // realising frames
+  int frame_index;
+  for (int i = 0; i < (int)numPages; i++)
+  {
+	  frame_index = pageTable[i].physicalPage;
+	  frameProvider->ReleaseFrame(frame_index);
+  }
+  
 }
 
 //----------------------------------------------------------------------
