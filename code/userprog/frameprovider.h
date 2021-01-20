@@ -3,8 +3,6 @@
 class FrameProvider
 {
 
-private:
-	BitMap *pageFrames;
 
 public:
 	FrameProvider(int numPages);
