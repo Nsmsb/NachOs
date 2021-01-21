@@ -14,8 +14,19 @@ static void StartUserProcess(int arg){
 	{
 		printf ("Unable to open file %s\n", filename);
 		nbProcess--;
+		varprocessp();
+		int i=0;
+		while(process[i]!=currentThread->tid){
+			i++;
+		}
+		while(attenteprocess[i] > 0){
+		((Semaphore*)pointeursem[i])->V();
+			attenteprocess[i]--;
+		}
+		varprocessv();
 		return;
 	}
+
 	space = new AddrSpace (executable);
 	currentThread->space = space;
 
@@ -35,17 +46,56 @@ static void StartUserProcess(int arg){
 }
 
 extern int do_ForkExec(char *filename){
+
+	int arg = (int) filename;
+	DEBUG('c', "Filename = %s\n", filename);
+	char *name = new char [MAX_STRING_SIZE];
+
+	varprocessp();
+
 	int pid = pidMax;
 	pidMax++;
 
-	DEBUG('c', "Filename = %s\n", filename);
-
-	int arg = (int) filename;
-	char *name = new char [MAX_STRING_SIZE];
+	int i=0;
+	while (process[i]!=-1 && i<100){
+		i++;
+	}
+	if(i<100){
 	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserProcessus", pid);
 	Thread *trd = new Thread(name);
+	process[i]=pid;
+	trd->tid=pid;
 	trd->Fork(StartUserProcess, arg);
-
+	}
+	else{
+		pid=999999999;
+	}
+	varprocessv();
+	
 	return pid;
 }
+
+
+extern void do_UserProcessJoin(int pid){
+
+	int i=0;
+	if(pid>pidMax){
+		printf("le processus a attendre n'éxiste pas");
+		return;
+	}
+	varprocessp();
+	while(process[i]!=pid && i<100){
+		i++;
+	}
+	if(i<100){
+		attenteprocess[i]++;
+		varprocessv();
+		((Semaphore*)pointeursem[i])->P();
+	}
+	return;
+}
+
+
+
+
 
