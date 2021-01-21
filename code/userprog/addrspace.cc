@@ -158,6 +158,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	  pageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
 	//   pageTable[i].physicalPage = i+1;
 	  pageTable[i].physicalPage = frameProvider->GetEmptyFrame();
+		bzero(machine->mainMemory + (pageTable[i].physicalPage * PageSize), PageSize);
 	  pageTable[i].valid = TRUE;
 	  pageTable[i].use = FALSE;
 	  pageTable[i].dirty = FALSE;
