@@ -108,10 +108,10 @@ Initialize (int argc, char **argv)
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
 		pidMax = 1;
-    process=new int[100];
-    pointeursem=new int[100];
-    attenteprocess=new int[100];
-    for(int u=0;u<100;u++){
+    process=new int[NbProcess];
+    pointeursem=new int[NbProcess];
+    attenteprocess=new int[NbProcess];
+    for(int u=0;u<NbProcess;u++){
 	process[u]=-1;
 	pointeursem[u]=(int)new Semaphore("semparprocess", 0);
 	attenteprocess[u]=0;

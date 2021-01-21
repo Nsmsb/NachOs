@@ -57,10 +57,10 @@ extern int do_ForkExec(char *filename){
 	pidMax++;
 
 	int i=0;
-	while (process[i]!=-1 && i<100){
+	while (process[i]!=-1 && i<NbProcess){
 		i++;
 	}
-	if(i<100){
+	if(i<NbProcess){
 	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserProcessus", pid);
 	Thread *trd = new Thread(name);
 	process[i]=pid;
@@ -84,10 +84,10 @@ extern void do_UserProcessJoin(int pid){
 		return;
 	}
 	varprocessp();
-	while(process[i]!=pid && i<100){
+	while(process[i]!=pid && i<NbProcess){
 		i++;
 	}
-	if(i<100){
+	if(i<NbProcess){
 		attenteprocess[i]++;
 		varprocessv();
 		((Semaphore*)pointeursem[i])->P();
