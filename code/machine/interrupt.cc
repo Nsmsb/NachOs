@@ -269,6 +269,9 @@ Interrupt::Exit(int value)
 				break;
 			}
 		}
+   	if(nbProcess>0){
+				currentThread->Finish();
+   	}
 		Cleanup();
 
 }

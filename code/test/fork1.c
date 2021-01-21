@@ -16,15 +16,10 @@ void f(void *s){
 int main()
 {
 	int tid = UserThreadCreate(f, (void *) THIS,(int)UserThreadExit);
-
-	//for(int i = 100 ; i < N+100 ; i++)
-	//	PutInt(i);
-
+	int val = -20;
+	f((void *) val);
 	UserThreadJoin(tid);
 
-	/*while(1){
-		tid++;
-	}*/
 
 	return 0;
 }
