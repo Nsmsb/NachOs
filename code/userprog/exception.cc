@@ -192,6 +192,9 @@ ExceptionHandler (ExceptionType which)
 					process[i]=-1;
 					varprocessv();
 					if(nbProcess>0){
+						if(currentThread->space != NULL){
+							delete currentThread->space;
+    						}
 						currentThread->Finish();
 					}
 					interrupt->Exit(machine->ReadRegister(4));
