@@ -271,7 +271,7 @@ Interrupt::Exit(int value)
 		}
 		nbProcess--;
     		if(nbProcess>0){
-			Exit (0);
+				currentThread->Finish();
    		}
 		Cleanup();
 

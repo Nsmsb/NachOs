@@ -155,7 +155,9 @@ Initialize (int argc, char **argv)
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state. 
-    currentThread = new Thread ("main");
+		char *name = new char[10];
+		snprintf(name, 10, "%s", "main");
+    currentThread = new Thread (name);
     currentThread->setStatus (RUNNING);
 
     interrupt->Enable ();
@@ -163,7 +165,6 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
-		bzero(machine->mainMemory, size);
 		synchconsole = new SynchConsole(NULL, NULL);
 #endif
 
