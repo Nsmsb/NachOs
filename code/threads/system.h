@@ -16,11 +16,15 @@
 #include "stats.h"
 #include "timer.h"
 
+#define NbProcess 100
+
 // Initialization and cleanup routines
 extern void Initialize (int argc, char **argv);	// Initialization,
 						// called before anything else
 extern void Cleanup ();		// Cleanup, called when
 						// Nachos is done.
+void varprocessv();
+void varprocessp();
 
 extern Thread *currentThread;	// the thread holding the CPU
 extern Thread *threadToBeDestroyed;	// the thread that just finished
@@ -28,7 +32,8 @@ extern Scheduler *scheduler;	// the ready list
 extern Interrupt *interrupt;	// interrupt status
 extern Statistics *stats;	// performance metrics
 extern Timer *timer;		// the hardware alarm clock
-extern int nbProcess;
+extern int nbProcess;		// nombre de processus en cours d'éxécution 
+
 
 #ifdef USER_PROGRAM
 #include "machine.h"
@@ -37,6 +42,9 @@ extern int nbProcess;
 extern Machine *machine;	// user program memory and registers
 extern SynchConsole *synchconsole;
 extern int pidMax;
+extern int *process;		// le processus qui sera en index process[i] avec son pid,
+extern int *pointeursem;	// pourra être attendu grace a (semaphore*)pointeursem[i]
+extern int *attenteprocess;	// et saura combien de processus l'attende grace a attenteprocess[i]
 #endif
 
 #ifdef FILESYS_NEEDED		// FILESYS or FILESYS_STUB

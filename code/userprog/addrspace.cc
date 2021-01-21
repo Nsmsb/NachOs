@@ -75,6 +75,8 @@ void AddrSpace::lockthreadp()
 	lockthread->P();
 }
 
+
+
 static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages)
 {
 	char temp_buffer[numBytes];
@@ -204,7 +206,6 @@ AddrSpace::~AddrSpace ()
   }
   delete tid;
   delete pile;
-  delete semthread;
   delete [] pageTable;
   // End of modification
   

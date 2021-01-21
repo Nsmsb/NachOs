@@ -269,10 +269,9 @@ Interrupt::Exit(int value)
 				break;
 			}
 		}
-		nbProcess--;
-    		if(nbProcess>0){
+   	if(nbProcess>0){
 				currentThread->Finish();
-   		}
+   	}
 		Cleanup();
 
 }

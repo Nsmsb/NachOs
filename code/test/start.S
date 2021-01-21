@@ -209,6 +209,16 @@ ForkExec:
 	j $31
 	.end ForkExec
 
+	.globl UserProcessJoin
+	.ent UserProcessJoin
+UserProcessJoin:
+	addiu $2, $0, SC_UserProcessJoin
+	syscall
+	j $31
+	.end UserProcessJoin
+
+
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main

@@ -39,6 +39,7 @@
 #define SC_UserThreadExit 18
 #define SC_UserThreadJoin 19
 #define SC_ForkExec	20
+#define SC_UserProcessJoin 21
 
 
 #ifdef IN_USER_MODE
@@ -175,6 +176,9 @@ void UserThreadExit();
 
 /*le thread appelant attent la fin du thread dont le tid est donner en paramètre*/
 void UserThreadJoin(int tid);
+
+/*le thread appelant attent la fin du processus cible*/
+void UserProcessJoin(int pid);
 
 /* Creates a new processus that executes the fil
  * given as argument.
