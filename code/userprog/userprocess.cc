@@ -5,8 +5,29 @@
 #include "addrspace.h"
 
 static void StartUserProcess(int arg){
-	char *filename = (char *) arg;
-	DEBUG('c', "Filename after cast = %s\n", filename);
+
+	AddrSpace *space=(AddrSpace*)arg;
+	
+	currentThread->space = space;
+
+	space->InitRegisters ();	// set the initial register values
+	space->RestoreState ();	// load page table register
+	
+
+	DEBUG('t', "%s has address space at %d\n", currentThread->getName(), currentThread->space);
+	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space);
+
+	machine->Run ();		// jump to the user progam
+	ASSERT (FALSE);		// machine->Run never returns
+
+}
+
+extern int do_ForkExec(char *filename){
+
+	DEBUG('c', "Filename = %s\n", filename);
+	char *name = new char [MAX_STRING_SIZE];
+
+
 	OpenFile *executable = fileSystem->Open (filename);
 	AddrSpace *space;
 
@@ -24,32 +45,19 @@ static void StartUserProcess(int arg){
 			attenteprocess[i]--;
 		}
 		varprocessv();
-		return;
+		return-1;
 	}
 
 	space = new AddrSpace (executable);
-	currentThread->space = space;
 
 	delete executable;		// close file
 
-	space->InitRegisters ();	// set the initial register values
-	space->RestoreState ();	// load page table register
-	
-	delete filename;
+	if(space->reussite==-1){
+		delete space;
+		printf("la création du processus a échouer\n");
+		return-1;
+	}
 
-	DEBUG('t', "%s has address space at %d\n", currentThread->getName(), currentThread->space);
-	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space);
-
-	machine->Run ();		// jump to the user progam
-	ASSERT (FALSE);		// machine->Run never returns
-
-}
-
-extern int do_ForkExec(char *filename){
-
-	int arg = (int) filename;
-	DEBUG('c', "Filename = %s\n", filename);
-	char *name = new char [MAX_STRING_SIZE];
 
 	varprocessp();
 
@@ -65,12 +73,14 @@ extern int do_ForkExec(char *filename){
 	Thread *trd = new Thread(name);
 	process[i]=pid;
 	trd->tid=pid;
-	trd->Fork(StartUserProcess, arg);
+	trd->Fork(StartUserProcess, (int)space);
 	}
 	else{
-		pid=999999999;
+		pid=-1;
 	}
 	varprocessv();
+
+
 	
 	return pid;
 }

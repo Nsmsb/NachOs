@@ -73,6 +73,16 @@ TimerInterruptHandler (int dummy)
 	interrupt->YieldOnReturn ();
 }
 
+void varprocessv()
+{
+	varprocess->V();
+}
+
+void varprocessp()
+{
+	varprocess->P();
+}
+
 //----------------------------------------------------------------------
 // Initialize
 //      Initialize Nachos global data structures.  Interpret command
@@ -84,15 +94,7 @@ TimerInterruptHandler (int dummy)
 //              ex: "nachos -d +" -> argv = {"nachos", "-d", "+"}
 //----------------------------------------------------------------------
 
-void varprocessv()
-{
-	varprocess->V();
-}
 
-void varprocessp()
-{
-	varprocess->P();
-}
 
 
 

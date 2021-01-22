@@ -30,7 +30,8 @@ main ()
 	  if (i > 0)
 	    {
 		newProc=ForkExec(buffer);
-		UserProcessJoin(newProc);
+		if(newProc!=-1)
+			UserProcessJoin(newProc);
 	    }
       }
 }

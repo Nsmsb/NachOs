@@ -52,6 +52,7 @@ class AddrSpace
     int *semthread;		//tableaux de Semaphore * convertie en int,chaque Semaphore est
  				//relier a un tid
     int pid;			//pid du processus
+    int reussite;
 
 
 	Semaphore *nbThreads;

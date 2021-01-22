@@ -63,7 +63,6 @@ BitMap::Mark (int which)
 void
 BitMap::Clear (int which)
 {
-    printf("recu %d ,limite %d\n",which,numBits);
     ASSERT (which >= 0 && which < numBits);
     map[which / BitsInWord] &= ~(1 << (which % BitsInWord));
 }
