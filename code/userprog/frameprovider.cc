@@ -1,52 +1,151 @@
-#include "frameprovider.h"
-#include "bitmap.h"
+// synchconsole.cc
+//
+//	Routines that simulate a synchronous I/O console.
+//
+
+
+#include "copyright.h"
+#include "system.h"
+#include "synchconsole.h"
 #include "synch.h"
 
-// constructor
-FrameProvider::FrameProvider(int numPages)
+static Semaphore *readAvail;
+static Semaphore *writeDone;
+
+static Semaphore *lect;		//Semaphore pour bloquer la lecture a d'autre thread
+static Semaphore *ecr;		//Semaphore pour bloquer l'écriture a d'autre thread
+
+
+static void ReadAvail(int arg)
 {
-	pageFrames = new BitMap(numPages);
+	readAvail->V();
 }
 
-FrameProvider::~FrameProvider()
+static void WriteDone(int arg)
 {
-	delete pageFrames;
+	writeDone->V();
 }
 
-int
-FrameProvider::GetEmptyFrame()
+SynchConsole::SynchConsole(char *readFile, char *writeFile)
 {
-	// simple version
-	int empty_frame = -1;
-	empty_frame = pageFrames->Find();
-
-	// random version
-	// int random_frame_id = rand() % pageFrames->NumClear();
-	// int free_frames[random_frame_id];
-
-	// // selecting the random frame
-	// for (int i = 0; i < random_frame_id; i++)
-	// 	free_frames[i] = pageFrames->Find();
-
-	// empty_frame = free_frames[random_frame_id-1];
-
-	// // freeing frames
-	// for (int i = 0; i < random_frame_id-1; i++)
-	// 	pageFrames->Clear(free_frames[i]);
-	
-	return empty_frame;
+	readAvail = new Semaphore("read avail", 0);
+	writeDone = new Semaphore("write done", 0);
+	lect = new Semaphore("lect", 1);
+	ecr = new Semaphore("ecr", 1);
+	console = new Console (readFile, writeFile, ReadAvail, WriteDone, 0);
 }
 
-void
-FrameProvider::ReleaseFrame(int numFrame)
+SynchConsole::~SynchConsole()
 {
-	// fm_mutex->P();
-	pageFrames->Clear(numFrame);
-	// fm_mutex->V();
+	delete console;
+	delete lect;
+	delete ecr;
+	delete writeDone;
+	delete readAvail;
 }
 
-int
-FrameProvider::NumAvailFrame()
+void SynchConsole::SynchPutChar(const char ch)
+{ 
+	ecr->P();
+	console->PutChar(ch);
+	writeDone->P();
+	ecr->V();
+}
+
+int SynchConsole::SynchGetChar()
 {
-	return pageFrames->NumClear();
+	int c;
+	lect->P();
+	readAvail->P();
+	c=console->GetChar();
+	lect->V();
+	return c;
+}
+
+void SynchConsole::SynchPutString(const char s[])
+{
+	for(int i=0 ; i < MAX_STRING_SIZE && s[i] != '\0' ; i++){
+		SynchPutChar(s[i]);
+	}
+}
+
+void SynchConsole::SynchGetString(char *s, int size)
+{
+	int i = 0;
+	char c;
+
+	// This feels *very* convoluted.
+	// We read "At most one less than size charaters" (see fgets specs')
+	if(size > 1){
+		do{
+			c = SynchGetChar();
+			s[i] = c;
+			i++;
+		}while((i < size-1) && (c >= 0) && (c != '\n'));
+	}
+
+	// Adding the terminating byte after the last character.
+	s[i] = '\0';
+}
+
+/* copyStringFromMachine(int from, char *to, unsigned size)
+ *	Copies a string at MIPS adress "from"
+ *	into a kernel pointer string "to".
+ *	Up to size character are copied. The string is terminated
+ *	by a '\0' even if none were copied.
+ */
+void SynchConsole::copyStringFromMachine(int from, char *to, unsigned size)
+{
+	unsigned i = 0;
+	int val = 0;
+	// We stop at i = size-1 so we can put the '\0' character.
+	for(i = 0 ; i < size-1 ; i++){
+		machine->ReadMem(from, 1, &val);
+		to[i] = (char) val;
+		if(val == '\0')
+			return;
+		from++;
+	}
+	to[i] = '\0';
+}
+
+/* copyStringToMachine
+ *	Copies a kernel string "from" to a user string
+ *	at MIPS adress "to".
+ *	size characters are copied
+ *
+ *	IMPORTANT : We assume the String comes from SynchGetString, so
+ *	there is a '\0' and it's after the first \n, or somewhere if there
+ *	are none.
+ */
+// Note : this function could be simplified, assuming the string comes from SynchGetChar.
+void SynchConsole::copyStringToMachine(int to, char *from, unsigned size)
+{
+	unsigned i = 0;
+	// We stop at size-1, since the last char is \0 ; and we don't want to overflow
+	while(i < size-1 && from[i] > 0){
+		machine->WriteMem(to, 1, from[i]);
+		to++;
+		i++;
+	}
+	machine->WriteMem(to, 1, from[i]);
+}
+
+void SynchConsole::SynchPutInt(int n)
+{
+	char* n_string =  new char(MAX_STRING_SIZE);
+	snprintf(n_string,MAX_STRING_SIZE,"%d",n);
+	synchconsole->SynchPutString(n_string);
+	delete n_string;
+}
+
+void SynchConsole::SynchGetInt(int* n)
+{
+	int n_int;
+	char* n_string = new char(MAX_STRING_SIZE);
+	SynchGetString(n_string, MAX_STRING_SIZE);
+	sscanf(n_string, "%d", &n_int);
+	machine->WriteMem(*n, 4, n_int);
+	delete n_string;
+
 }
