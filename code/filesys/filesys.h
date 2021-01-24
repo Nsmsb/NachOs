@@ -73,9 +73,13 @@ class FileSystem {
     					// If "format", there is nothing on
 					// the disk, so initialize the directory
     					// and the bitmap of free blocks.
+	
+	int FindDirectorySector(const char *name);		// returns the sector of file's parent directory
 
     bool Create(const char *name, int initialSize);  	
 					// Create a file (UNIX creat)
+	
+	bool CreateDir(const char *name);		// creat a directory
 
     OpenFile* Open(const char *name); 	// Open a file (UNIX open)
 

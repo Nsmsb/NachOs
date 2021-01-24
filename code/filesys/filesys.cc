@@ -51,6 +51,8 @@
 #include "filehdr.h"
 #include "filesys.h"
 
+#define MAX_STRING_LEN 128
+
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
 // sectors, so that they can be located on boot-up.
@@ -63,6 +65,57 @@
 #define FreeMapFileSize 	(NumSectors / BitsInByte)
 #define NumDirEntries 		10
 #define DirectoryFileSize 	(sizeof(DirectoryEntry) * NumDirEntries)
+#define MaxDepth 3
+
+
+
+// utility function to parse file path
+// it returns char** array of size MAX_DEPTH + 2 (depth, pathstring)
+// last 3 elements are filename, depth, and string that contains names of folders
+// (same string as path, but all '/' are remplaced by '\0')
+char** parsePath(char *path) {
+    char *dirNames = new char[MAX_STRING_LEN];
+	char **directories = new char*[MaxDepth+2];
+	int path_len = strlen(path);
+	int depth = 0;
+	int next_dir = 0;
+
+	// skiping the '/' char
+	if (path[0] == '/')
+		path++;
+	strcpy(dirNames, path);
+
+
+	// replacing all '/' by '\0'
+	int i = 0;
+	for (; i < path_len && depth <= MaxDepth; i++)
+	{
+		if (dirNames[i] == '/')
+		{
+			dirNames[i] = '\0';
+			directories[depth++] = &dirNames[next_dir];
+			next_dir = i+1;
+		}
+	}
+	
+	directories[MaxDepth] = (char*) depth;
+	directories[MaxDepth+1] = dirNames;
+	return directories;	
+}
+
+
+// Utiliyu function: it takes file name (or path), return pointer points to
+// the base name (file name).
+char* findFileName(char *name)
+{
+	char *result = name;
+	for (int i = 0; i < (int)strlen(name); i++)
+		if (name[i] == '/') 
+			result = &name[i+1];
+
+
+	return result;
+}
 
 //----------------------------------------------------------------------
 // FileSystem::FileSystem
@@ -142,6 +195,42 @@ FileSystem::FileSystem(bool format)
     }
 }
 
+int
+FileSystem::FindDirectorySector(const char *name)
+{
+	char filePath[MAX_STRING_LEN];
+	strcpy(filePath, name);
+
+	char **directories = parsePath(filePath);
+	int depth = (int)directories[MaxDepth];
+	printf("depth = %d\n\n", depth);
+
+
+	int sector = DirectorySector; // Start from root dir
+
+    if(depth != 0) { // i.e. not root
+        OpenFile* dirFile;
+        Directory* dirTemp;
+
+        for (int i = 0; i < depth; i++) {
+            DEBUG('D', "Finding directory \"%s\" in sector \"%d\"\n", directories[i], sector);
+            dirFile = new OpenFile(sector);
+            dirTemp = new Directory(NumDirEntries);
+            dirTemp->FetchFrom(dirFile);
+            sector = dirTemp->Find(directories[i]);
+            if (sector == -1)
+                break; // Not found
+        }
+        delete dirFile;
+        delete dirTemp;
+    }
+
+	delete directories[MaxDepth+1];
+	delete directories;
+
+    return sector;
+}
+
 //----------------------------------------------------------------------
 // FileSystem::Create
 // 	Create a file in the Nachos file system (similar to UNIX create).
@@ -177,15 +266,36 @@ FileSystem::Create(const char *name, int initialSize)
     Directory *directory;
     BitMap *freeMap;
     FileHeader *hdr;
+	OpenFile *parentDirFile;
+	int parentDirSector;
     int sector;
     bool success;
+	bool isDir = FALSE;
+
+	// findinf base file name
+	char path[strlen(name)];
+	strcpy(path, name);
+	char *baseName = findFileName(path);
 
     DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
 
-    directory = new Directory(NumDirEntries);
-    directory->FetchFrom(directoryFile);
+	parentDirSector = FindDirectorySector(name);	// finding parent directory
+	if (parentDirSector == -1)						// wrong path, directory not found
+		return FALSE;
 
-    if (directory->Find(name) != -1)
+	if (initialSize == -1)
+	{
+		isDir = TRUE;
+		initialSize = DirectoryFileSize;
+	}
+	
+	
+	parentDirFile = new OpenFile(parentDirSector);
+    directory = new Directory(NumDirEntries);
+    // directory->FetchFrom(directoryFile);
+    directory->FetchFrom(parentDirFile);
+
+    if (directory->Find(baseName) != -1)
       success = FALSE;			// file is already in directory
     else {	
         freeMap = new BitMap(NumSectors);
@@ -193,25 +303,45 @@ FileSystem::Create(const char *name, int initialSize)
         sector = freeMap->Find();	// find a sector to hold the file header
     	if (sector == -1) 		
             success = FALSE;		// no free block for file header 
-        else if (!directory->Add(name, sector))
+        else if (!directory->Add(baseName, sector))
             success = FALSE;	// no space in directory
-	else {
-    	    hdr = new FileHeader;
-	    if (!hdr->Allocate(freeMap, initialSize))
-            	success = FALSE;	// no space on disk for data
-	    else {	
-	    	success = TRUE;
-		// everthing worked, flush all changes back to disk
-    	    	hdr->WriteBack(sector); 		
-    	    	directory->WriteBack(directoryFile);
-    	    	freeMap->WriteBack(freeMapFile);
-	    }
-            delete hdr;
-	}
+		else {
+			hdr = new FileHeader;
+			if (!hdr->Allocate(freeMap, initialSize))
+					success = FALSE;	// no space on disk for data
+			else {	
+				success = TRUE;
+				// everthing worked, flush all changes back to disk
+				if (isDir)					// setting file type
+					hdr->setDirType();
+				hdr->WriteBack(sector); 		
+				directory->WriteBack(parentDirFile);
+				if(isDir) {
+					Directory* dir = new Directory(NumDirEntries);
+					OpenFile* subDirFile = new OpenFile(sector);
+					dir->WriteBack(subDirFile);
+					delete dir;
+					delete subDirFile;
+				}
+				freeMap->WriteBack(freeMapFile);
+			}
+			delete hdr;
+		}
         delete freeMap;
     }
     delete directory;
     return success;
+}
+
+//----------------------------------------------------------------------
+// FileSystem::CreateDir
+// 	Create a directory file in the Nachos file system, it uses the FileSystem::Create
+//----------------------------------------------------------------------
+
+bool
+FileSystem::CreateDir(const char *name)
+{
+	return Create(name, -1);
 }
 
 //----------------------------------------------------------------------
@@ -228,15 +358,28 @@ OpenFile *
 FileSystem::Open(const char *name)
 { 
     Directory *directory = new Directory(NumDirEntries);
+    OpenFile *parentDirFile = NULL;
     OpenFile *openFile = NULL;
+	int parentDirSector;
     int sector;
 
+	// findinf base file name
+	char path[strlen(name)];
+	strcpy(path, name);
+	char *baseName = findFileName(path);
+
     DEBUG('f', "Opening file %s\n", name);
-    directory->FetchFrom(directoryFile);
-    sector = directory->Find(name); 
+	parentDirSector = FindDirectorySector(name);
+	ASSERT(parentDirSector != -1);		// making sure we're working with valide path
+
+	parentDirFile = new OpenFile(parentDirSector);
+    // directory->FetchFrom(directoryFile);
+    directory->FetchFrom(parentDirFile);
+    sector = directory->Find(baseName); 
     if (sector >= 0) 		
 	openFile = new OpenFile(sector);	// name was found in directory 
     delete directory;
+	delete parentDirFile;
     return openFile;				// return NULL if not found
 }
 

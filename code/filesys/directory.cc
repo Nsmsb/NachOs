@@ -192,14 +192,31 @@ void
 Directory::Print()
 { 
     FileHeader *hdr = new FileHeader;
+	int subDirSectors[tableSize];
+	int subDirs = 0;
 
     printf("Directory contents:\n");
     for (int i = 0; i < tableSize; i++)
 	if (table[i].inUse) {
-	    printf("Name: %s, Sector: %d\n", table[i].name, table[i].sector);
 	    hdr->FetchFrom(table[i].sector);
+		// checking if a file is a dir, add it to subDirs, for printing
+		if (hdr->isDir())
+			subDirSectors[subDirs++] = table[i].sector;		
+	    printf("\nName: %s, Type: %s, Sector: %d\n", table[i].name, hdr->isDir() ? "directory" : "simple file", table[i].sector);
 	    hdr->Print();
 	}
     printf("\n");
+
+	// recursively printing sub directories
+	Directory *subDir = new Directory(10); // 10 NumDirEntries
+	for (int i = 0; i < subDirs; i++)
+	{
+		OpenFile *subDirFile = new OpenFile(subDirSectors[i]);
+		subDir->FetchFrom(subDirFile);
+		subDir->Print();
+		delete subDirFile;
+	}
+
+	delete subDir;
     delete hdr;
 }
