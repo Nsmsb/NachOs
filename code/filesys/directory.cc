@@ -169,9 +169,17 @@ Directory::Remove(const char *name)
 void
 Directory::List()
 {
-   for (int i = 0; i < tableSize; i++)
-	if (table[i].inUse)
-	    printf("%s\n", table[i].name);
+	FileHeader *hdr = new FileHeader;
+	for (int i = 0; i < tableSize; i++)
+	{
+		if (table[i].inUse)
+		{
+			hdr->FetchFrom(table[i].sector);			
+			// printf("%s\n", table[i].name);
+			printf(hdr->isDir() ? "\033[32;1m%s\033[0m\n" : "%s\n", table[i].name);
+		}
+	}
+	delete hdr;
 }
 
 //----------------------------------------------------------------------
