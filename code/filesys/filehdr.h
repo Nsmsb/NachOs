@@ -60,6 +60,8 @@ class FileHeader {
 	
 	void setDirType();			// set file type to dir
 
+	bool isDir();				// returns true if a file is Directory File
+
     void Print();			// Print the contents of the file.
 
   private:

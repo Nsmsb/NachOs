@@ -41,6 +41,7 @@
 bool
 FileHeader::Allocate(BitMap *freeMap, int fileSize)
 { 
+	fileType = SimpleFile;
     numBytes = fileSize;
     numSectors  = divRoundUp(fileSize, SectorSize);
     if (freeMap->NumClear() < numSectors)
@@ -118,6 +119,28 @@ int
 FileHeader::FileLength()
 {
     return numBytes;
+}
+
+//----------------------------------------------------------------------
+// FileHeader::setDirType
+// 	set File type to Directory.
+//----------------------------------------------------------------------
+
+void
+FileHeader::setDirType()
+{
+	fileType = DirFile;
+}
+
+//----------------------------------------------------------------------
+// FileHeader::isDir()
+// 	returns true if file is a directory.
+//----------------------------------------------------------------------
+
+bool
+FileHeader::isDir()
+{
+	return fileType == DirFile;
 }
 
 //----------------------------------------------------------------------
