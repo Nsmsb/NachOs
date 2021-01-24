@@ -159,6 +159,10 @@ main (int argc, char **argv)
 		else if (!strcmp (*argv, "-D"))
 		{			// print entire filesystem
 			fileSystem->Print ();
+		} else if (!strcmp(*argv, "-mkdir")) { // make directory
+            ASSERT(argc > 1);
+            fileSystem->CreateDir(*(argv + 1));
+            argCount = 2;
 		}
 		else if (!strcmp (*argv, "-t"))
 		{			// performance test
