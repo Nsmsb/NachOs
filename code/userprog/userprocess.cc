@@ -5,26 +5,14 @@
 #include "addrspace.h"
 
 static void StartUserProcess(int arg){
-	char *filename = (char *) arg;
-	DEBUG('c', "Filename after cast = %s\n", filename);
-	OpenFile *executable = fileSystem->Open (filename);
-	AddrSpace *space;
 
-	if (executable == NULL)
-	{
-		printf ("Unable to open file %s\n", filename);
-		nbProcess--;
-		return;
-	}
-	space = new AddrSpace (executable);
+	AddrSpace *space=(AddrSpace*)arg;
+	
 	currentThread->space = space;
-
-	delete executable;		// close file
 
 	space->InitRegisters ();	// set the initial register values
 	space->RestoreState ();	// load page table register
 	
-	delete filename;
 
 	DEBUG('t', "%s has address space at %d\n", currentThread->getName(), currentThread->space);
 	DEBUG('t', "%s has physical page address %d\n", currentThread->getName(), currentThread->space);
@@ -35,17 +23,89 @@ static void StartUserProcess(int arg){
 }
 
 extern int do_ForkExec(char *filename){
+
+	DEBUG('c', "Filename = %s\n", filename);
+	char *name = new char [MAX_STRING_SIZE];
+
+
+	OpenFile *executable = fileSystem->Open (filename);
+	AddrSpace *space;
+
+	if (executable == NULL)
+	{
+		printf ("Unable to open file %s\n", filename);
+		nbProcess--;
+		varprocessp();
+		int i=0;
+		while(process[i]!=currentThread->tid){
+			i++;
+		}
+		while(attenteprocess[i] > 0){
+		((Semaphore*)pointeursem[i])->V();
+			attenteprocess[i]--;
+		}
+		varprocessv();
+		return-1;
+	}
+
+	space = new AddrSpace (executable);
+
+	delete executable;		// close file
+
+	if(space->reussite==-1){
+		delete space;
+		printf("la création du processus a échouer\n");
+		return-1;
+	}
+
+
+	varprocessp();
+
 	int pid = pidMax;
 	pidMax++;
 
-	DEBUG('c', "Filename = %s\n", filename);
-
-	int arg = (int) filename;
-	char *name = new char [MAX_STRING_SIZE];
+	int i=0;
+	while (process[i]!=-1 && i<NbProcess){
+		i++;
+	}
+	if(i<NbProcess){
 	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserProcessus", pid);
 	Thread *trd = new Thread(name);
-	trd->Fork(StartUserProcess, arg);
+	process[i]=pid;
+	trd->tid=pid;
+	trd->Fork(StartUserProcess, (int)space);
+	}
+	else{
+		pid=-1;
+	}
+	varprocessv();
 
+
+	
 	return pid;
 }
+
+
+extern void do_UserProcessJoin(int pid){
+
+	int i=0;
+	if(pid>pidMax){
+		printf("le processus a attendre n'éxiste pas");
+		return;
+	}
+	varprocessp();
+	while(process[i]!=pid && i<NbProcess){
+		i++;
+	}
+	if(i<NbProcess){
+		attenteprocess[i]++;
+		varprocessv();
+		((Semaphore*)pointeursem[i])->P();
+	}
+	return;
+}
+
+
+
+
 

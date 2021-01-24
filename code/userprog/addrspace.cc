@@ -75,6 +75,8 @@ void AddrSpace::lockthreadp()
 	lockthread->P();
 }
 
+
+
 static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, int position, TranslationEntry *pageTable, unsigned numPages)
 {
 	char temp_buffer[numBytes];
@@ -153,18 +155,32 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	   numPages, size);
 // first, set up the translation 
     pageTable = new TranslationEntry[NumPhysPages];
-    for (i = 0; i < numPages; i++)
+    reussite=0;
+    int tmp=0;
+    i=0;
+    while (i < numPages && tmp!=-1)
       {
 	  pageTable[i].virtualPage = i;	// for now, virtual page # = phys page #
 	//   pageTable[i].physicalPage = i+1;
-	  pageTable[i].physicalPage = frameProvider->GetEmptyFrame();
+	  tmp=frameProvider->GetEmptyFrame();
+	  pageTable[i].physicalPage = tmp;
+		if(tmp!=-1)
+			bzero(machine->mainMemory + (pageTable[i].physicalPage * PageSize), PageSize);
 	  pageTable[i].valid = TRUE;
 	  pageTable[i].use = FALSE;
 	  pageTable[i].dirty = FALSE;
 	  pageTable[i].readOnly = FALSE;	// if the code segment was entirely on 
 	  // a separate page, we could set its 
 	  // pages to be read-only
+	  i++;
       }
+     if(tmp==-1){
+	 while (i < numPages){
+		pageTable[i].physicalPage = -1;
+		i++;
+	}
+        reussite=-1;
+     }
 
 // zero out the entire address space, to zero the unitialized data segment 
 // and the stack segment
@@ -203,8 +219,6 @@ AddrSpace::~AddrSpace ()
   }
   delete tid;
   delete pile;
-  delete semthread;
-  delete [] pageTable;
   // End of modification
   
   // realising frames
@@ -212,8 +226,10 @@ AddrSpace::~AddrSpace ()
   for (int i = 0; i < (int)numPages; i++)
   {
 	  frame_index = pageTable[i].physicalPage;
-	  frameProvider->ReleaseFrame(frame_index);
+	  if(frame_index!=-1)
+	  	frameProvider->ReleaseFrame(frame_index);
   }
+  delete [] pageTable;
   
 }
 

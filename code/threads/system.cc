@@ -7,10 +7,12 @@
 
 #include "copyright.h"
 #include "system.h"
+#include "synch.h"
 
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
+static Semaphore *varprocess;	//controle l'acces a process et pointeurprocess
 int nbProcess;
 Thread *currentThread;		// the thread we are running now
 Thread *threadToBeDestroyed;	// the thread that just finished
@@ -32,6 +34,9 @@ SynchDisk *synchDisk;
 Machine *machine;		// user program memory and registers
 SynchConsole *synchconsole;
 int pidMax;
+int *process;
+int *pointeursem;
+int *attenteprocess;
 #endif
 
 #ifdef NETWORK
@@ -68,6 +73,16 @@ TimerInterruptHandler (int dummy)
 	interrupt->YieldOnReturn ();
 }
 
+void varprocessv()
+{
+	varprocess->V();
+}
+
+void varprocessp()
+{
+	varprocess->P();
+}
+
 //----------------------------------------------------------------------
 // Initialize
 //      Initialize Nachos global data structures.  Interpret command
@@ -78,6 +93,11 @@ TimerInterruptHandler (int dummy)
 //      "argv" is an array of strings, one for each command line argument
 //              ex: "nachos -d +" -> argv = {"nachos", "-d", "+"}
 //----------------------------------------------------------------------
+
+
+
+
+
 void
 Initialize (int argc, char **argv)
 {
@@ -85,10 +105,19 @@ Initialize (int argc, char **argv)
     int argCount;
     const char *debugArgs = "";
     bool randomYield = FALSE;
+    varprocess= new Semaphore("varprocess", 1);
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
 		pidMax = 1;
+    process=new int[NbProcess];
+    pointeursem=new int[NbProcess];
+    attenteprocess=new int[NbProcess];
+    for(int u=0;u<NbProcess;u++){
+	process[u]=-1;
+	pointeursem[u]=(int)new Semaphore("semparprocess", 0);
+	attenteprocess[u]=0;
+    }
 #endif
 #ifdef FILESYS_NEEDED
     bool format = FALSE;	// format disk
@@ -155,7 +184,9 @@ Initialize (int argc, char **argv)
     // We didn't explicitly allocate the current thread we are running in.
     // But if it ever tries to give up the CPU, we better have a Thread
     // object to save its state. 
-    currentThread = new Thread ("main");
+    char * name=new char [5];
+    snprintf(name,5, "%s", "main");
+    currentThread = new Thread (name);
     currentThread->setStatus (RUNNING);
 
     interrupt->Enable ();
@@ -187,6 +218,7 @@ void
 Cleanup ()
 {
     printf ("\nCleaning up...\n");
+    delete varprocess;
 #ifdef NETWORK
     delete postOffice;
 #endif
@@ -194,6 +226,9 @@ Cleanup ()
 #ifdef USER_PROGRAM
     delete machine;
     delete synchconsole;
+    delete process;
+    delete pointeursem;
+    delete attenteprocess;
 #endif
 
 #ifdef FILESYS_NEEDED

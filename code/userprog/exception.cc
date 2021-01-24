@@ -155,6 +155,13 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_UserProcessJoin: {
+					DEBUG('c', "UserProcessJoin, called by user.\n");
+					int pid=machine->ReadRegister(4);
+					do_UserProcessJoin(pid);
+					break;
+				}
+
 				case SC_ForkExec: {
 					DEBUG('c', "ForkExec : arg1 = %d\n", machine->ReadRegister(4));
 					nbProcess++;
@@ -167,11 +174,29 @@ ExceptionHandler (ExceptionType which)
 				}
 
 				case SC_Exit: {
-					while(currentThread->space->userthread>0){
+					while(currentThread->space->userthread > 0){
 						currentThread->space->haltp();
 					}
 
 					DEBUG('c', "Exit : All threads terminated. Main is now ending.\n");
+					varprocessp();
+					nbProcess--;
+					int i=0;
+					while(process[i]!=currentThread->tid){
+						i++;
+					}
+					while(attenteprocess[i] > 0){
+						((Semaphore*)pointeursem[i])->V();
+						attenteprocess[i]--;
+					}
+					process[i]=-1;
+					varprocessv();
+					if(nbProcess>0){
+						if(currentThread->space != NULL){
+							delete currentThread->space;
+    						}
+						currentThread->Finish();
+					}
 					interrupt->Exit(machine->ReadRegister(4));
 					break;
 				}

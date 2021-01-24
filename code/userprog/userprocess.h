@@ -9,4 +9,6 @@
 
 extern int do_ForkExec(char *filename);
 
+extern void do_UserProcessJoin(int pid);
+
 #endif
