@@ -15,7 +15,6 @@ void f(void *s){
 	for(i = 0 ; i < N ; i++)
 		puts((char *)s);
 
-	//UserThreadExit();
 }
 
 int main()
