@@ -20,6 +20,10 @@
 #define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
 #define MaxFileSize 	(NumDirect * SectorSize)
 
+// file types
+#define SimpleFile 0
+#define DirFile 1
+
 // The following class defines the Nachos "file header" (in UNIX terms,  
 // the "i-node"), describing where on disk to find all of the data in the file.
 // The file header is organized as a simple table of pointers to
@@ -53,10 +57,15 @@ class FileHeader {
 
     int FileLength();			// Return the length of the file 
 					// in bytes
+	
+	void setDirType();			// set file type to dir
+
+	bool isDir();				// returns true if a file is Directory File
 
     void Print();			// Print the contents of the file.
 
   private:
+	int fileType;			// file type (directory or file)
     int numBytes;			// Number of bytes in the file
     int numSectors;			// Number of data sectors in the file
     int dataSectors[NumDirect];		// Disk sector numbers for each data 
