@@ -11,19 +11,33 @@ void afficheTeste(){
 	PutString("--putchar :créé un processus qui va écrire\n");
 	PutString("--getstring :créé un processus qui va lire une chaine de caractère et l'écrire\n");
 	PutString("--getint :créé un processus qui lie et écrire 5 entier\n");
+	PutString("--t n:éssaye de crée n threads maximume 20 ,qui afficherons ab\n");
 	return;
 }
 
 
 void affichecommande(){
 
+	PutChar('\n');
 	PutString("--q :quitter le minishell\n");
-	PutString("--t :afficher les programme disponible\n");
+	PutString("--i :afficher les programme disponible\n");
 	PutString("--c :afficher les commandes\n");
+	PutChar('\n');
 }
 
 
+void teste(void *a){
 
+	int i=0;
+	char c='i';
+	while(c!='\0'){
+		c=((char*)a)[i];
+		PutChar(c);
+		i++;
+	}
+	PutChar('\n');
+
+}
 
 
 
@@ -33,6 +47,11 @@ main ()
     
     char prompt[3], buffer[60];
     int i,newProc[20],n,attenteprocess,arg,finarg;
+
+    char a[3];
+	a[0]='a';
+	a[1]='b';
+	a[2]='\0';
 
     prompt[0] = '-';
     prompt[1] = '-';
@@ -48,7 +67,6 @@ main ()
 
 	  i = 0;
 	  GetString(buffer, 60);
-	  PutChar('a');
 	  while (buffer[i] != '\n' && i<60) {
 
 		if(buffer[i]==' '){
@@ -71,16 +89,28 @@ main ()
 	  else{
 		buffer[i] = '\0';
 	  }
-	  if(i==1){//lacommande fait 1 caractère l'entrée est destiner aux minishelle et pas a 
+	  if(buffer[1] == '\0'){//lacommande fait 1 caractère l'entrée est destiner aux minishelle et pas a 
 		   //crée un processus
 		if(buffer[0]=='q'){//fin du minishelle
 			return 0;
 		}
-		else if(buffer[0]=='t'){
+		else if(buffer[0]=='i'){
 			afficheTeste();//indique les fichier de teste disponible
 		}
 		else if(buffer[0]=='c'){
 			affichecommande();
+		}
+		else if(buffer[0]=='t'){
+			while(n>=0){
+				newProc[n]=UserThreadCreate(teste,(void *)a,(int)UserThreadExit);
+				n--;
+			}
+			while(attenteprocess>=0){
+				if(newProc[attenteprocess]!=-1){
+					UserThreadJoin(newProc[attenteprocess]);
+				}
+				attenteprocess--;
+			}
 		}
 	  }
 	  else if (i > 0 && i<60){
