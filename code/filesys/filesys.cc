@@ -230,8 +230,6 @@ FileSystem::FindDirectorySector(const char *name)
 
 	char **directories = parsePath(filePath);
 	int depth = (int)directories[MaxDepth];
-	printf("depth = %d\n\n", depth);
-
 
 	int sector = DirectorySector; // Start from root dir
 
@@ -379,16 +377,45 @@ FileSystem::CreateDir(const char *name)
 bool
 FileSystem::RemoveDir(const char *name)
 {
-	OpenFile *dirFile = Open(name);
+	OpenFile *dirFile;
+	FileHeader *hdr = new FileHeader();
 	Directory *dir = new Directory(NumDirEntries);
 	bool success = FALSE;
+	int parentDirSector, dirSector;
 
-	if (dirFile != NULL)
+	// findinf base file name
+	char path[strlen(name)];
+	strcpy(path, name);
+	char *baseName = findFileName(path);
+	
+	parentDirSector = FindDirectorySector(name);
+	if (parentDirSector != -1)			// check if path is valide
+	{
+		dirFile = new OpenFile(parentDirSector);
+		dir->FetchFrom(dirFile);
+		dirSector = dir->Find(baseName);
+		delete dirFile;
+		dirFile = NULL;
+		if (dirSector != -1)			// if the file exist
+		{
+			hdr->FetchFrom(dirSector);
+			if (hdr->isDir())			// check if it's a directory
+			{
+				dirFile = new OpenFile(dirSector);
+			}
+		}
+		
+	}
+
+	if (dirFile != NULL)				// if the file exist, and it's a directory, remove it only if it is empty
 	{
 		dir->FetchFrom(dirFile);
 		if (dir->isEmpty())
-			success = Remove(name);
+			success = Remove(baseName);
 	}
+
+	delete dirFile;
+	delete dir;
 	
 	return success;	
 }
