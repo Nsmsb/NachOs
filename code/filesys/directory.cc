@@ -162,6 +162,24 @@ Directory::Remove(const char *name)
 }
 
 //----------------------------------------------------------------------
+// Directory::isEmpty
+// 	Checks if all Entries are not in use, if at least one Entry 
+//	is used, reurns False, otherwise the folder is Empty, it returns True.
+//----------------------------------------------------------------------
+
+bool
+Directory::isEmpty()
+{ 
+    bool isEmpty = TRUE;
+
+	for (int i = 0; i < tableSize && !isEmpty; i++)
+		if (table[i].inUse)
+			isEmpty = FALSE
+	
+	return isEmpty;
+}
+
+//----------------------------------------------------------------------
 // Directory::List
 // 	List all the file names in the directory. 
 //----------------------------------------------------------------------
