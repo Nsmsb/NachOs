@@ -102,6 +102,8 @@ class FileSystem {
 	
 	bool CreateDir(const char *name);		// creat a directory
 
+	bool RemoveDir(const char *name);		// Remove a directory
+
     OpenFile* Open(const char *name); 	// Open a file (UNIX open)
 	
     // int Close(OpenFile *openFile); 	// Close a file (UNIX open)

@@ -372,6 +372,28 @@ FileSystem::CreateDir(const char *name)
 }
 
 //----------------------------------------------------------------------
+// FileSystem::RemoveDir
+// 	Remove a directory file in the Nachos file system, it uses the FileSystem::Remove
+//----------------------------------------------------------------------
+
+bool
+FileSystem::RemoveDir(const char *name)
+{
+	OpenFile *dirFile = Open(name);
+	Directory *dir = new Directory(NumDirEntries);
+	bool success = FALSE;
+
+	if (dirFile != NULL)
+	{
+		dir->FetchFrom(dirFile);
+		if (dir->isEmpty())
+			success = Remove(name);
+	}
+	
+	return success;	
+}
+
+//----------------------------------------------------------------------
 // FileSystem::Open
 // 	Open a file for reading and writing.  
 //	To open a file:
@@ -398,8 +420,7 @@ FileSystem::Open(const char *name)
 
     DEBUG('f', "Opening file %s\n", name);
 	parentDirSector = FindDirectorySector(name);
-	// ASSERT(parentDirSector != -1);		// making sure we're working with valide path
-
+	// ASSERT(parentDirSector != -1);		
 	if (parentDirSector != 1)
 	{
 		parentDirFile = new OpenFile(parentDirSector);
