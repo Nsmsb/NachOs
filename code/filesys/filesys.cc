@@ -448,7 +448,7 @@ FileSystem::Open(const char *name)
     DEBUG('f', "Opening file %s\n", name);
 	parentDirSector = FindDirectorySector(name);
 	// ASSERT(parentDirSector != -1);		
-	if (parentDirSector != 1)
+	if (parentDirSector != -1)
 	{
 		parentDirFile = new OpenFile(parentDirSector);
 		// directory->FetchFrom(directoryFile);
