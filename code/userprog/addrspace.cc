@@ -24,8 +24,6 @@
 
 #include <strings.h>		/* for bzero */
 
-static Semaphore *halt; //Semaphore pour que le thread main attende la fin de tout les thread
-static Semaphore *lockthread;
 
 // frame provider
 static FrameProvider *frameProvider = new FrameProvider((int)(NumPhysPages));;
@@ -57,22 +55,22 @@ SwapHeader (NoffHeader * noffH)
 
 void AddrSpace::haltv()
 {
-	halt->V();
+	((Semaphore*)halt)->V();
 }
 
 void AddrSpace::haltp()
 {
-	halt->P();
+	((Semaphore*)halt)->P();
 }
 
 void AddrSpace::lockthreadv()
 {
-	lockthread->V();
+	((Semaphore*)lockthread)->V();
 }
 
 void AddrSpace::lockthreadp()
 {
-	lockthread->P();
+	((Semaphore*)lockthread)->P();
 }
 
 
@@ -114,8 +112,11 @@ static void ReadAtVirtual( OpenFile *executable, int virtualaddr, int numBytes, 
 //static Semaphore *halt;
 AddrSpace::AddrSpace (OpenFile * executable)
 {
-    halt = new Semaphore("halt", 0);
-    lockthread = new Semaphore("lockthread", 1);
+    char name[MAX_STRING_SIZE];
+    snprintf(name, MAX_STRING_SIZE, "%s%s", "halt ",currentThread->getName());
+    halt =(int) new Semaphore(name, 0);
+    snprintf(name, MAX_STRING_SIZE, "%s%s", "lockthread ",currentThread->getName());
+    lockthread =(int) new Semaphore(name, 1);
     semthread= new int[nbthread];
 	// if (!frameProvider)
 		// frameProvider = new FrameProvider((int)(NumPhysPages));
@@ -130,7 +131,8 @@ AddrSpace::AddrSpace (OpenFile * executable)
     for(int h=0;h<nbthread;h++){
 	tid[h]=0;
 	pile[h]=-1;
-	semthread[h]=(int)new Semaphore("semthread", 0);
+	snprintf(name, MAX_STRING_SIZE, "%s%d%s", "semthread", h,currentThread->getName());
+	this->semthread[h]=(int)new Semaphore(name, 0);
     }
 
 	// we won't change it here, it deosn't write to machine memory
@@ -212,8 +214,8 @@ AddrSpace::~AddrSpace ()
 {
   // LB: Missing [] for delete
   // delete pageTable;
-  delete halt;
-  delete lockthread;
+  delete (Semaphore*)halt;
+  delete (Semaphore*)lockthread;
   for(int y=0;y<nbthread;y++){
 	delete ((Semaphore*)semthread[y]);
   }

@@ -55,6 +55,7 @@ extern int do_ForkExec(char *filename){
 	if(space->reussite==-1){
 		delete space;
 		printf("la création du processus a échouer\n");
+		nbProcess--;
 		return-1;
 	}
 
@@ -76,6 +77,7 @@ extern int do_ForkExec(char *filename){
 	trd->Fork(StartUserProcess, (int)space);
 	}
 	else{
+		delete space;
 		pid=-1;
 	}
 	varprocessv();
@@ -101,6 +103,9 @@ extern void do_UserProcessJoin(int pid){
 		attenteprocess[i]++;
 		varprocessv();
 		((Semaphore*)pointeursem[i])->P();
+	}
+	else{
+		varprocessv();
 	}
 	return;
 }
