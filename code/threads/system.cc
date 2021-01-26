@@ -12,7 +12,7 @@
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
-static Semaphore *varprocess;	//controle l'acces a process et pointeurprocess
+static Semaphore *varprocess;	//controle l'acces a process ,pointeurProcess et pointeurprocess
 int nbProcess;
 Thread *currentThread;		// the thread we are running now
 Thread *threadToBeDestroyed;	// the thread that just finished
@@ -37,6 +37,7 @@ int pidMax;
 int *process;
 int *pointeursem;
 int *attenteprocess;
+int *pointeurProcess;
 #endif
 
 #ifdef NETWORK
@@ -106,10 +107,12 @@ Initialize (int argc, char **argv)
     const char *debugArgs = "";
     bool randomYield = FALSE;
     varprocess= new Semaphore("varprocess", 1);
+	
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
-		pidMax = 1;
+    pidMax = 1;
+    pointeurProcess=new int[NbProcess];
     process=new int[NbProcess];
     pointeursem=new int[NbProcess];
     attenteprocess=new int[NbProcess];
@@ -117,6 +120,7 @@ Initialize (int argc, char **argv)
 	process[u]=-1;
 	pointeursem[u]=(int)new Semaphore("semparprocess", 0);
 	attenteprocess[u]=0;
+	pointeurProcess[u]=-1;
     }
 #endif
 #ifdef FILESYS_NEEDED
@@ -194,7 +198,8 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
-		synchconsole = new SynchConsole(NULL, NULL);
+    synchconsole = new SynchConsole(NULL, NULL);
+    pointeurProcess[0]=(int)currentThread;
 #endif
 
 #ifdef FILESYS
@@ -224,6 +229,7 @@ Cleanup ()
 #endif
 
 #ifdef USER_PROGRAM
+    delete pointeurProcess;
     delete machine;
     delete synchconsole;
     delete process;

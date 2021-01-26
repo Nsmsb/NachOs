@@ -118,6 +118,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
     snprintf(name, MAX_STRING_SIZE, "%s%s", "lockthread ",currentThread->getName());
     lockthread =(int) new Semaphore(name, 1);
     semthread= new int[nbthread];
+    pointeurThread=new int[nbthread];
 	// if (!frameProvider)
 		// frameProvider = new FrameProvider((int)(NumPhysPages));
 
@@ -131,6 +132,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
     for(int h=0;h<nbthread;h++){
 	tid[h]=0;
 	pile[h]=-1;
+	pointeurThread[h]=-1;
 	snprintf(name, MAX_STRING_SIZE, "%s%d%s", "semthread", h,currentThread->getName());
 	this->semthread[h]=(int)new Semaphore(name, 0);
     }

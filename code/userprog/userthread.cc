@@ -50,6 +50,7 @@ void do_UserThreadExit(){
 		currentThread->space->tid[pPile]--;
 	}
 	currentThread->space->pile[pPile]=-1;
+	currentThread->space->pointeurThread[pPile]=-1;
 	currentThread->space->lockthreadv();
 	currentThread->space->userthread--;
 	
@@ -122,8 +123,21 @@ int do_UserThreadCreate(int f, int arg){
 	char *name = new char [MAX_STRING_SIZE];
 	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserThread", tiduse);
 	Thread *t = new Thread(name);
+	currentThread->space->pointeurThread[j]=(int)t;
 	t->Fork (StartUserThread,(int)i);
 
 	return  tiduse;
 }
+
+
+int do_open(char *name){
+
+	return 0;
+
+}
+
+
+
+
+
 

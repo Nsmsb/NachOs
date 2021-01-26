@@ -190,6 +190,7 @@ ExceptionHandler (ExceptionType which)
 						attenteprocess[i]--;
 					}
 					process[i]=-1;
+					pointeurProcess[i]=-1;
 					varprocessv();
 					if(nbProcess>0){
 						if(currentThread->space != NULL){
@@ -198,6 +199,16 @@ ExceptionHandler (ExceptionType which)
 						currentThread->Finish();
 					}
 					interrupt->Exit(machine->ReadRegister(4));
+					break;
+				}
+
+				case SC_Open: {
+					DEBUG('c', "Open, called by user.\n");
+					int tmp;
+					char *filename = new char[MAX_STRING_SIZE];
+					synchconsole->copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);
+					tmp=do_open(filename);
+					machine->WriteRegister(2, tmp);
 					break;
 				}
 
