@@ -190,6 +190,7 @@ ExceptionHandler (ExceptionType which)
 						attenteprocess[i]--;
 					}
 					process[i]=-1;
+					pointeurProcess[i]=-1;
 					varprocessv();
 					if(nbProcess>0){
 						if(currentThread->space != NULL){

@@ -38,6 +38,7 @@
 
 Thread::Thread (const char *threadName)
 {
+    
     tid =-1;
     name = threadName;
     stackTop = NULL;

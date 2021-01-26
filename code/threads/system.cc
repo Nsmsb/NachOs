@@ -12,7 +12,7 @@
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
-static Semaphore *varprocess;	//controle l'acces a process et pointeurprocess
+static Semaphore *varprocess;	//controle l'acces a process ,pointeurProcess et pointeurprocess
 int nbProcess;
 Thread *currentThread;		// the thread we are running now
 Thread *threadToBeDestroyed;	// the thread that just finished
@@ -21,9 +21,6 @@ Interrupt *interrupt;		// interrupt status
 Statistics *stats;		// performance metrics
 Timer *timer;			// the hardware timer device,
 					// for invoking context switches
-int* file;
-int* threadproprietaire;
-static Semaphore *semfile;
 
 #ifdef FILESYS_NEEDED
 FileSystem *fileSystem;
@@ -40,6 +37,7 @@ int pidMax;
 int *process;
 int *pointeursem;
 int *attenteprocess;
+int *pointeurProcess;
 #endif
 
 #ifdef NETWORK
@@ -86,16 +84,6 @@ void varprocessp()
 	varprocess->P();
 }
 
-void semfilev()
-{
-	semfile->V();
-}
-
-void semfilep()
-{
-	semfile->P();
-}
-
 //----------------------------------------------------------------------
 // Initialize
 //      Initialize Nachos global data structures.  Interpret command
@@ -119,25 +107,20 @@ Initialize (int argc, char **argv)
     const char *debugArgs = "";
     bool randomYield = FALSE;
     varprocess= new Semaphore("varprocess", 1);
-    file=new int[10];
-    threadproprietaire=new int[10];
-    semfile=new Semaphore("semfile", 1);
-    for(int y=0;y<10;y++){
-	file[y]=-1;
-	threadproprietaire[y]=-1;
-    }
 	
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
-		pidMax = 1;
+    pidMax = 1;
+    pointeurProcess=new int[NbProcess];
     process=new int[NbProcess];
     pointeursem=new int[NbProcess];
     attenteprocess=new int[NbProcess];
     for(int u=0;u<NbProcess;u++){
 	process[u]=-1;
-	pointeursem=(int)new Semaphore("semparprocess", 0);
+	pointeursem[u]=(int)new Semaphore("semparprocess", 0);
 	attenteprocess[u]=0;
+	pointeurProcess[u]=-1;
     }
 #endif
 #ifdef FILESYS_NEEDED
@@ -215,7 +198,8 @@ Initialize (int argc, char **argv)
 
 #ifdef USER_PROGRAM
     machine = new Machine (debugUserProg);	// this must come first
-		synchconsole = new SynchConsole(NULL, NULL);
+    synchconsole = new SynchConsole(NULL, NULL);
+    pointeurProcess[0]=(int)currentThread;
 #endif
 
 #ifdef FILESYS
@@ -239,16 +223,13 @@ void
 Cleanup ()
 {
     printf ("\nCleaning up...\n");
-    delete file;
-    delete threadproprietaire;
-    delete semfile;
-    
     delete varprocess;
 #ifdef NETWORK
     delete postOffice;
 #endif
 
 #ifdef USER_PROGRAM
+    delete pointeurProcess;
     delete machine;
     delete synchconsole;
     delete process;

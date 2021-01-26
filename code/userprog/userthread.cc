@@ -50,6 +50,7 @@ void do_UserThreadExit(){
 		currentThread->space->tid[pPile]--;
 	}
 	currentThread->space->pile[pPile]=-1;
+	currentThread->space->pointeurThread[pPile]=-1;
 	currentThread->space->lockthreadv();
 	currentThread->space->userthread--;
 	
@@ -122,6 +123,7 @@ int do_UserThreadCreate(int f, int arg){
 	char *name = new char [MAX_STRING_SIZE];
 	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserThread", tiduse);
 	Thread *t = new Thread(name);
+	currentThread->space->pointeurThread[j]=(int)t;
 	t->Fork (StartUserThread,(int)i);
 
 	return  tiduse;
@@ -130,41 +132,11 @@ int do_UserThreadCreate(int f, int arg){
 
 int do_open(char *name){
 
-	int i=0;
-	semfilep();
-	while(threadproprietaire[i]==-1 &&i<10){
-		i++;
-	}
-	if(i>=10){
-		printf("trops de fichier ouvert pour ouvrire %s\n",name);
-	}
-	printf("overture de %s\n",name);
-	//si pas encore ouvert
-	threadproprietaire[i]=(int)currentThread;
-	
-
-	semfilev();
 	return 0;
 
 }
 
 
-int do_close(int id){
-
-	semfilep();
-	if((int)currentThread==threadproprietaire[id]{
-		printf("fermeture de %d\n",id);
-		//close file[id]
-		threadproprietaire[id]=-1;
-	}
-	else{
-		printf("vous ne pouver pas fermer se fichier%d\n",id);
-	}
-
-	semfilev();
-	return 0;
-
-}
 
 
 

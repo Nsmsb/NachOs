@@ -73,13 +73,17 @@ extern int do_ForkExec(char *filename){
 	snprintf(name, MAX_STRING_SIZE, "%s%d", "UserProcessus", pid);
 	Thread *trd = new Thread(name);
 	process[i]=pid;
+	pointeurProcess[i]=(int)trd;
 	trd->tid=pid;
 	trd->Fork(StartUserProcess, (int)space);
 	}
 	else{
 		delete space;
-		pid=-1;
+		varprocessv();
+		nbProcess--;
+		return -1;
 	}
+	
 	varprocessv();
 
 
@@ -99,7 +103,7 @@ extern void do_UserProcessJoin(int pid){
 	while(process[i]!=pid && i<NbProcess){
 		i++;
 	}
-	if(i<NbProcess){
+	if(i<NbProcess && process[i]!=-1){
 		attenteprocess[i]++;
 		varprocessv();
 		((Semaphore*)pointeursem[i])->P();
