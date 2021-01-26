@@ -66,6 +66,7 @@
 #define NumDirEntries 		10
 #define DirectoryFileSize 	(sizeof(DirectoryEntry) * NumDirEntries)
 #define MaxDepth 3
+#define NumOpenFiles 10
 
 
 
@@ -116,6 +117,12 @@ char* findFileName(char *name)
 
 	return result;
 }
+
+// FileSystem::static vraible
+static OpenFileEntry *openFilesData[NumOpenFiles];
+OpenFileEntry** FileSystem::OpenFilesTable = openFilesData;
+BitMap* FileSystem::OpenFileMap = new BitMap(NumOpenFiles);
+
 
 //----------------------------------------------------------------------
 // FileSystem::FileSystem
@@ -193,6 +200,26 @@ FileSystem::FileSystem(bool format)
         freeMapFile = new OpenFile(FreeMapSector);
         directoryFile = new OpenFile(DirectorySector);
     }
+}
+
+//----------------------------------------------------------------------
+// FileSystem::isOpen
+// 	search in OpenFilesTable, returns the index of the first Entry that matches the given FileSector
+//	  if the file is not Open before, returns -1
+//----------------------------------------------------------------------
+
+int
+FileSystem::isOpen(int fileSector)
+{
+	int result = -1;
+	// TODO: acquire mutex
+	for (int i = 0; i < NumOpenFiles; i++)
+		if (OpenFilesTable[i] != NULL && OpenFilesTable[i]->sector == fileSector)
+		{
+			result = i;
+			break;
+		}
+	return result;
 }
 
 int
@@ -361,7 +388,8 @@ FileSystem::Open(const char *name)
     OpenFile *parentDirFile = NULL;
     OpenFile *openFile = NULL;
 	int parentDirSector;
-    int sector;
+	int openFileIndex;
+    int sector = -1;
 
 	// findinf base file name
 	char path[strlen(name)];
@@ -370,14 +398,23 @@ FileSystem::Open(const char *name)
 
     DEBUG('f', "Opening file %s\n", name);
 	parentDirSector = FindDirectorySector(name);
-	ASSERT(parentDirSector != -1);		// making sure we're working with valide path
+	// ASSERT(parentDirSector != -1);		// making sure we're working with valide path
 
-	parentDirFile = new OpenFile(parentDirSector);
-    // directory->FetchFrom(directoryFile);
-    directory->FetchFrom(parentDirFile);
-    sector = directory->Find(baseName); 
-    if (sector >= 0) 		
-	openFile = new OpenFile(sector);	// name was found in directory 
+	if (parentDirSector != 1)
+	{
+		parentDirFile = new OpenFile(parentDirSector);
+		// directory->FetchFrom(directoryFile);
+		directory->FetchFrom(parentDirFile);
+		sector = directory->Find(baseName); 
+	}
+    if (sector >= 0) {				// name was found in directory 
+		openFileIndex = OpenFileMap->Find();
+		if (openFileIndex != -1)	// there is an empty case in the OpenFiles Table to open the file
+		{
+			openFile = new OpenFile(sector);	
+			OpenFilesTable[openFileIndex] = new OpenFileEntry(sector, openFile);
+		}
+	}
     delete directory;
 	delete parentDirFile;
     return openFile;				// return NULL if not found
@@ -403,11 +440,25 @@ FileSystem::Remove(const char *name)
     Directory *directory;
     BitMap *freeMap;
     FileHeader *fileHdr;
+	OpenFile *parentDirFile;
+	int parentDirSector;
     int sector;
-    
+
+	// findinf base file name
+	char path[strlen(name)];
+	strcpy(path, name);
+	char *baseName = findFileName(path);
+
+	// finding parent dir
+	parentDirSector = FindDirectorySector(name);
+	if (parentDirSector == -1)			// making sure we're working with valide path
+		return FALSE;
+	parentDirFile = new OpenFile(parentDirSector);
     directory = new Directory(NumDirEntries);
-    directory->FetchFrom(directoryFile);
-    sector = directory->Find(name);
+	directory->FetchFrom(parentDirFile);
+
+	// finding file sector
+	sector = directory->Find(baseName); 
     if (sector == -1) {
        delete directory;
        return FALSE;			 // file not found 
@@ -482,3 +533,17 @@ FileSystem::Print()
     delete freeMap;
     delete directory;
 } 
+
+
+// OpenFileEntery Class
+
+OpenFileEntry::OpenFileEntry(int fileSector, OpenFile *file)
+{
+	this->sector = fileSector;
+	this->openFile = file;
+}
+
+OpenFileEntry::~OpenFileEntry()
+{
+
+}
