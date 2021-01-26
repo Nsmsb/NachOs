@@ -163,6 +163,10 @@ main (int argc, char **argv)
             ASSERT(argc > 1);
             fileSystem->CreateDir(*(argv + 1));
             argCount = 2;
+		} else if (!strcmp(*argv, "-rmdir")) { // make directory
+            ASSERT(argc > 1);
+            fileSystem->RemoveDir(*(argv + 1));
+            argCount = 2;
 		}
 		else if (!strcmp (*argv, "-t"))
 		{			// performance test
