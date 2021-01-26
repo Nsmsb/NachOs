@@ -26,6 +26,9 @@ extern void Cleanup ();		// Cleanup, called when
 void varprocessv();
 void varprocessp();
 
+void semfilev();
+void semfilep();
+
 extern Thread *currentThread;	// the thread holding the CPU
 extern Thread *threadToBeDestroyed;	// the thread that just finished
 extern Scheduler *scheduler;	// the ready list
@@ -33,6 +36,8 @@ extern Interrupt *interrupt;	// interrupt status
 extern Statistics *stats;	// performance metrics
 extern Timer *timer;		// the hardware alarm clock
 extern int nbProcess;		// nombre de processus en cours d'éxécution 
+extern int* file;
+extern int* threadproprietaire;
 
 
 #ifdef USER_PROGRAM

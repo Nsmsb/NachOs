@@ -16,5 +16,9 @@ int cherchepospile(int tid);
 
 extern int do_UserThreadCreate(int f, int arg);
 
+int do_open(char *name);
+
+int do_close(int id);
+
 
 #endif

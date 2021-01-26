@@ -127,3 +127,45 @@ int do_UserThreadCreate(int f, int arg){
 	return  tiduse;
 }
 
+
+int do_open(char *name){
+
+	int i=0;
+	semfilep();
+	while(threadproprietaire[i]==-1 &&i<10){
+		i++;
+	}
+	if(i>=10){
+		printf("trops de fichier ouvert pour ouvrire %s\n",name);
+	}
+	printf("overture de %s\n",name);
+	//si pas encore ouvert
+	threadproprietaire[i]=(int)currentThread;
+	
+
+	semfilev();
+	return 0;
+
+}
+
+
+int do_close(int id){
+
+	semfilep();
+	if((int)currentThread==threadproprietaire[id]{
+		printf("fermeture de %d\n",id);
+		//close file[id]
+		threadproprietaire[id]=-1;
+	}
+	else{
+		printf("vous ne pouver pas fermer se fichier%d\n",id);
+	}
+
+	semfilev();
+	return 0;
+
+}
+
+
+
+

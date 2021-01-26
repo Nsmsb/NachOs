@@ -21,6 +21,9 @@ Interrupt *interrupt;		// interrupt status
 Statistics *stats;		// performance metrics
 Timer *timer;			// the hardware timer device,
 					// for invoking context switches
+int* file;
+int* threadproprietaire;
+static Semaphore *semfile;
 
 #ifdef FILESYS_NEEDED
 FileSystem *fileSystem;
@@ -83,6 +86,16 @@ void varprocessp()
 	varprocess->P();
 }
 
+void semfilev()
+{
+	semfile->V();
+}
+
+void semfilep()
+{
+	semfile->P();
+}
+
 //----------------------------------------------------------------------
 // Initialize
 //      Initialize Nachos global data structures.  Interpret command
@@ -106,6 +119,14 @@ Initialize (int argc, char **argv)
     const char *debugArgs = "";
     bool randomYield = FALSE;
     varprocess= new Semaphore("varprocess", 1);
+    file=new int[10];
+    threadproprietaire=new int[10];
+    semfile=new Semaphore("semfile", 1);
+    for(int y=0;y<10;y++){
+	file[y]=-1;
+	threadproprietaire[y]=-1;
+    }
+	
 
 #ifdef USER_PROGRAM
     bool debugUserProg = FALSE;	// single step user program
@@ -115,7 +136,7 @@ Initialize (int argc, char **argv)
     attenteprocess=new int[NbProcess];
     for(int u=0;u<NbProcess;u++){
 	process[u]=-1;
-	pointeursem[u]=(int)new Semaphore("semparprocess", 0);
+	pointeursem=(int)new Semaphore("semparprocess", 0);
 	attenteprocess[u]=0;
     }
 #endif
@@ -218,6 +239,10 @@ void
 Cleanup ()
 {
     printf ("\nCleaning up...\n");
+    delete file;
+    delete threadproprietaire;
+    delete semfile;
+    
     delete varprocess;
 #ifdef NETWORK
     delete postOffice;

@@ -201,6 +201,16 @@ ExceptionHandler (ExceptionType which)
 					break;
 				}
 
+				case SC_Open: {
+					DEBUG('c', "Open, called by user.\n");
+					int tmp;
+					char *filename = new char[MAX_STRING_SIZE];
+					synchconsole->copyStringFromMachine(machine->ReadRegister(4), filename, MAX_STRING_SIZE);
+					tmp=do_open(filename);
+					machine->WriteRegister(2, tmp);
+					break;
+				}
+
 				default: {
 					printf("Unexpected user mode exception %d %d\n", which, type);
 				}

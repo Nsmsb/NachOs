@@ -128,6 +128,7 @@ main ()
 			}
 			attenteprocess--;
 		}
+		PutChar('\n');
 	  }
 	  else if (i>=60){//si la chaine de caractère n'a pas pus être récuperer en une seule fois on
 			//le buffer de synchonsole
