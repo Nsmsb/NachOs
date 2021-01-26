@@ -172,7 +172,7 @@ Directory::isEmpty()
 { 
     bool isEmpty = TRUE;
 
-	for (int i = 0; i < tableSize && !isEmpty; i++)
+	for (int i = 0; i < tableSize && isEmpty; i++)
 		if (table[i].inUse)
 			isEmpty = FALSE;
 	
