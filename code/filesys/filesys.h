@@ -37,6 +37,7 @@
 
 #include "copyright.h"
 #include "openfile.h"
+#include "bitmap.h"
 
 #ifdef FILESYS_STUB 		// Temporarily implement file system calls as 
 				// calls to UNIX, until the real file system
@@ -65,8 +66,25 @@ class FileSystem {
 };
 
 #else // FILESYS
+
+class OpenFileEntry
+{
+private:
+	/* data */
+public:
+	int sector;
+	OpenFile *openFile;
+	
+
+	OpenFileEntry(int FileSector, OpenFile *file);
+	~OpenFileEntry();
+};
+
 class FileSystem {
   public:
+	static OpenFileEntry **OpenFilesTable;
+	static BitMap *OpenFileMap;
+
     FileSystem(bool format);		// Initialize the file system.
 					// Must be called *after* "synchDisk" 
 					// has been initialized.
@@ -74,6 +92,9 @@ class FileSystem {
 					// the disk, so initialize the directory
     					// and the bitmap of free blocks.
 	
+	static int isOpen(int fileSector);				// if file is open it returns the OpenFileEntry index
+											// of the first found file, otherwise it returns -1
+
 	int FindDirectorySector(const char *name);		// returns the sector of file's parent directory
 
     bool Create(const char *name, int initialSize);  	
@@ -82,6 +103,8 @@ class FileSystem {
 	bool CreateDir(const char *name);		// creat a directory
 
     OpenFile* Open(const char *name); 	// Open a file (UNIX open)
+	
+    // int Close(OpenFile *openFile); 	// Close a file (UNIX open)
 
     bool Remove(const char *name); 	// Delete a file (UNIX unlink)
 
