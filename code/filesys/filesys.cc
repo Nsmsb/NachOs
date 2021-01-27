@@ -468,6 +468,26 @@ FileSystem::Open(const char *name)
     return openFile;				// return NULL if not found
 }
 
+bool
+FileSystem::Close(OpenFile *openFile)
+{
+	bool success = FALSE;
+	// todo: use mutex
+	for (int i = 0; i < NumOpenFiles; i++)
+	{
+		if (OpenFilesTable[i] != NULL && OpenFilesTable[i]->openFile == openFile)
+		{
+			OpenFileMap->Mark(i);
+			delete OpenFilesTable[i];
+			OpenFilesTable[i] = NULL;
+			success = TRUE;
+			break;
+		}
+	}
+	return success;
+	
+}
+
 
 //----------------------------------------------------------------------
 // FileSystem::removeFile

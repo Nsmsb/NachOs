@@ -37,6 +37,7 @@
 
 #include "copyright.h"
 #include "openfile.h"
+#include "directory.h"
 #include "bitmap.h"
 
 #ifdef FILESYS_STUB 		// Temporarily implement file system calls as 
@@ -100,7 +101,7 @@ class FileSystem {
 
     OpenFile* Open(const char *name); 	// Open a file (UNIX open)
 	
-    // int Close(OpenFile *openFile); 	// Close a file (UNIX close)
+    bool Close(OpenFile *openFile); 	// Close a file (UNIX close)
 	
 	bool Create(const char *name, int initialSize);	// Create a file (UNIX creat)
 
