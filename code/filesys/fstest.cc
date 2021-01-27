@@ -16,6 +16,7 @@
 
 #include "utility.h"
 #include "filesys.h"
+#include "directory.h"
 #include "system.h"
 #include "thread.h"
 #include "disk.h"
@@ -183,3 +184,14 @@ PerformanceTest()
     stats->Print();
 }
 
+void
+LsDir(char *name)
+{
+	OpenFile *dirFile = fileSystem->Open(name);
+	Directory *dir = new Directory(10);		//NumDirEntries
+	dir->FetchFrom(dirFile);
+	dir->List();
+	fileSystem->Close(dirFile);
+	delete dir;
+	delete dirFile;	
+}
