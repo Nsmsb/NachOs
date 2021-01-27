@@ -410,10 +410,7 @@ FileSystem::RemoveDir(const char *name)
 	{
 		dir->FetchFrom(dirFile);
 		if (dir->isEmpty())
-		{
-			removeFile(baseName, dirSector, dir);
-			success = TRUE;
-		}
+			success = removeFile(baseName, dirSector, dir);
 	}
 
 	delete ParentDirFile;
@@ -472,14 +469,26 @@ FileSystem::Open(const char *name)
 }
 
 
+//----------------------------------------------------------------------
+// FileSystem::removeFile
 // local function to remove a file from a directory
-void
+// name is the file name, file sector, directory that contines the file
+//----------------------------------------------------------------------
+
+bool
 FileSystem::removeFile(char *name, int sector, Directory *dir)
 {
-	FileHeader *fileHdr = new FileHeader;
+	FileHeader *fileHdr;
+	BitMap *freeMap;
+
+	// TODO: use mutex
+	if (isOpen(sector) != -1)
+		return FALSE;
+	
+	fileHdr = new FileHeader;
     fileHdr->FetchFrom(sector);
 
-    BitMap *freeMap = new BitMap(NumSectors);
+    freeMap = new BitMap(NumSectors);
     freeMap->FetchFrom(freeMapFile);
 
     fileHdr->Deallocate(freeMap);  		// remove data blocks
@@ -488,8 +497,11 @@ FileSystem::removeFile(char *name, int sector, Directory *dir)
 
     freeMap->WriteBack(freeMapFile);		// flush to disk
     dir->WriteBack(directoryFile);        // flush to disk
+
     delete fileHdr;
     delete freeMap;
+
+	return TRUE;
 }
 
 //----------------------------------------------------------------------
@@ -509,10 +521,12 @@ FileSystem::removeFile(char *name, int sector, Directory *dir)
 bool
 FileSystem::Remove(const char *name)
 { 
+	FileHeader *hdr;
     Directory *directory;
 	OpenFile *parentDirFile;
 	int parentDirSector;
     int sector;
+	bool success = FALSE;
 
 	// findinf base file name
 	char path[strlen(name)];
@@ -530,15 +544,19 @@ FileSystem::Remove(const char *name)
 	// finding file sector
 	sector = directory->Find(baseName); 
     if (sector == -1) {
-       delete directory;
-       return FALSE;			 // file not found 
+		delete parentDirFile;
+		delete directory;
+		return FALSE;			 // file not found 
     }
 
 	// remove file
-	removeFile(baseName, sector, directory);
+	hdr = new FileHeader();
+	hdr->FetchFrom(sector);
+	if (!hdr->isDir())
+		success = removeFile(baseName, sector, directory);
 
     delete directory;
-    return TRUE;
+    return success;
 } 
 
 //----------------------------------------------------------------------

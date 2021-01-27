@@ -120,7 +120,7 @@ class FileSystem {
    OpenFile* directoryFile;		// "Root" directory -- list of 
 								// file names, represented as a file
 
-   void removeFile(char *name, int sector, Directory *dir);		// prec to remove a file from a directory, used to optimize code
+   bool removeFile(char *name, int sector, Directory *dir);		// prec to remove a file from a directory, used to optimize code
 
 };
 
