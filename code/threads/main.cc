@@ -34,6 +34,10 @@
 //    -l lists the contents of the Nachos directory
 //    -D prints the contents of the entire file system 
 //    -t tests the performance of the Nachos file system
+//    -rmdir remove an empty directory
+//    -mkdir creats a new Directory
+//    -ls <dir> list the content of a directory
+//    -test run FileSystem test (check fstest.cc)
 //
 //  NETWORK
 //    -n sets the network reliability
@@ -58,7 +62,7 @@
 // External functions used by this file
 
 extern void ThreadTest (void), Copy (const char *unixFile, const char *nachosFile);
-extern void Print (char *file), PerformanceTest (void);
+extern void Print (char *file), PerformanceTest (void), LsDir(char *file);
 extern void StartProcess (char *file), ConsoleTest (char *in, char *out);
 extern void SynchConsoleTest(char *in, char *out);
 extern void MailTest (int networkID);
@@ -166,6 +170,10 @@ main (int argc, char **argv)
 		} else if (!strcmp(*argv, "-rmdir")) { // make directory
             ASSERT(argc > 1);
             fileSystem->RemoveDir(*(argv + 1));
+            argCount = 2;
+		} else if (!strcmp(*argv, "-ls")) { // list a directory content
+            ASSERT(argc > 1);
+            LsDir(*(argv + 1));
             argCount = 2;
 		}
 		else if (!strcmp (*argv, "-t"))
