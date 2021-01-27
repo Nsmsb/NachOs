@@ -97,28 +97,31 @@ class FileSystem {
 
 	int FindDirectorySector(const char *name);		// returns the sector of file's parent directory
 
-    bool Create(const char *name, int initialSize);  	
-					// Create a file (UNIX creat)
+
+    OpenFile* Open(const char *name); 	// Open a file (UNIX open)
 	
+    // int Close(OpenFile *openFile); 	// Close a file (UNIX close)
+	
+	bool Create(const char *name, int initialSize);	// Create a file (UNIX creat)
+
 	bool CreateDir(const char *name);		// creat a directory
 
 	bool RemoveDir(const char *name);		// Remove a directory
 
-    OpenFile* Open(const char *name); 	// Open a file (UNIX open)
-	
-    // int Close(OpenFile *openFile); 	// Close a file (UNIX open)
-
     bool Remove(const char *name); 	// Delete a file (UNIX unlink)
 
-    void List();			// List all the files in the file system
+    void List();			// List all the files in the '/' directory
 
-    void Print();			// List all the files and their contents
+    void Print();			// List all the files and their contents of '/' directory (all files system)
 
   private:
    OpenFile* freeMapFile;		// Bit map of free disk blocks,
-					// represented as a file
+								// represented as a file
    OpenFile* directoryFile;		// "Root" directory -- list of 
-					// file names, represented as a file
+								// file names, represented as a file
+
+   void removeFile(char *name, int sector, Directory *dir);		// prec to remove a file from a directory, used to optimize code
+
 };
 
 #endif // FILESYS

@@ -378,6 +378,7 @@ bool
 FileSystem::RemoveDir(const char *name)
 {
 	OpenFile *dirFile;
+	OpenFile *ParentDirFile;
 	FileHeader *hdr = new FileHeader();
 	Directory *dir = new Directory(NumDirEntries);
 	bool success = FALSE;
@@ -391,11 +392,9 @@ FileSystem::RemoveDir(const char *name)
 	parentDirSector = FindDirectorySector(name);
 	if (parentDirSector != -1)			// check if path is valide
 	{
-		dirFile = new OpenFile(parentDirSector);
-		dir->FetchFrom(dirFile);
+		ParentDirFile = new OpenFile(parentDirSector);
+		dir->FetchFrom(ParentDirFile);
 		dirSector = dir->Find(baseName);
-		delete dirFile;
-		dirFile = NULL;
 		if (dirSector != -1)			// if the file exist
 		{
 			hdr->FetchFrom(dirSector);
@@ -411,9 +410,13 @@ FileSystem::RemoveDir(const char *name)
 	{
 		dir->FetchFrom(dirFile);
 		if (dir->isEmpty())
-			success = Remove(baseName);
+		{
+			removeFile(baseName, dirSector, dir);
+			success = TRUE;
+		}
 	}
 
+	delete ParentDirFile;
 	delete dirFile;
 	delete dir;
 	
@@ -468,6 +471,27 @@ FileSystem::Open(const char *name)
     return openFile;				// return NULL if not found
 }
 
+
+// local function to remove a file from a directory
+void
+FileSystem::removeFile(char *name, int sector, Directory *dir)
+{
+	FileHeader *fileHdr = new FileHeader;
+    fileHdr->FetchFrom(sector);
+
+    BitMap *freeMap = new BitMap(NumSectors);
+    freeMap->FetchFrom(freeMapFile);
+
+    fileHdr->Deallocate(freeMap);  		// remove data blocks
+    freeMap->Clear(sector);			// remove header block
+    dir->Remove(name);
+
+    freeMap->WriteBack(freeMapFile);		// flush to disk
+    dir->WriteBack(directoryFile);        // flush to disk
+    delete fileHdr;
+    delete freeMap;
+}
+
 //----------------------------------------------------------------------
 // FileSystem::Remove
 // 	Delete a file from the file system.  This requires:
@@ -486,8 +510,6 @@ bool
 FileSystem::Remove(const char *name)
 { 
     Directory *directory;
-    BitMap *freeMap;
-    FileHeader *fileHdr;
 	OpenFile *parentDirFile;
 	int parentDirSector;
     int sector;
@@ -511,21 +533,11 @@ FileSystem::Remove(const char *name)
        delete directory;
        return FALSE;			 // file not found 
     }
-    fileHdr = new FileHeader;
-    fileHdr->FetchFrom(sector);
 
-    freeMap = new BitMap(NumSectors);
-    freeMap->FetchFrom(freeMapFile);
+	// remove file
+	removeFile(baseName, sector, directory);
 
-    fileHdr->Deallocate(freeMap);  		// remove data blocks
-    freeMap->Clear(sector);			// remove header block
-    directory->Remove(name);
-
-    freeMap->WriteBack(freeMapFile);		// flush to disk
-    directory->WriteBack(directoryFile);        // flush to disk
-    delete fileHdr;
     delete directory;
-    delete freeMap;
     return TRUE;
 } 
 
