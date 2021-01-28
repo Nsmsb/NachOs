@@ -257,10 +257,25 @@ FsTest()
 	printf("\n########### FILE SYSTEM Creating Files ###########\n\n");
 	for (int i = 0; i < 10; i++)
 	{
-		success = fileSystem->CreateDir(fileNames[i]);
+		success = fileSystem->Create(fileNames[i], 1);
 		printf("[Create() test %d] File %s ", i, fileNames[i]);
 		printf(success ? "\033[32;1mOK\033[0m\n" : "ERROR\n");
 		ASSERT(success);
+	}
+
+	printf("\n########### FILE SYSTEM Opening/Closing Files ###########\n\n");
+	for (int i = 0; i < 10; i++)
+	{
+		OpenFile *openFile;
+		openFile = fileSystem->Open(fileNames[i]);
+		printf("[Open() test %d] File %s ", i, fileNames[i]);
+		printf(openFile != NULL ? "\033[32;1mOK\033[0m\n" : "ERROR\n");
+		
+		// closing a file
+		success = fileSystem->Close(openFile);
+		printf("[Close() test %d] File %s ", i, fileNames[i]);
+		printf(success ? "\033[32;1mOK\033[0m\n" : "ERROR\n");
+		delete openFile;
 	}
 
 
