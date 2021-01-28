@@ -93,7 +93,7 @@ class FileSystem {
 					// the disk, so initialize the directory
     					// and the bitmap of free blocks.
 	
-	static int isOpen(int fileSector);				// if file is open it returns the OpenFileEntry index
+	static bool isOpen(int fileSector);				// if file is open it returns the OpenFileEntry index
 											// of the first found file, otherwise it returns -1
 
 	int FindDirectorySector(const char *name);		// returns the sector of file's parent directory

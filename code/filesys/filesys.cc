@@ -208,18 +208,23 @@ FileSystem::FileSystem(bool format)
 //	  if the file is not Open before, returns -1
 //----------------------------------------------------------------------
 
-int
+bool
 FileSystem::isOpen(int fileSector)
 {
-	int result = -1;
+	bool isOpen = FALSE;
+	int openFileCounter = 0;
 	// TODO: acquire mutex
 	for (int i = 0; i < NumOpenFiles; i++)
 		if (OpenFilesTable[i] != NULL && OpenFilesTable[i]->sector == fileSector)
 		{
-			result = i;
-			break;
+			openFileCounter++;
+			if (openFileCounter == 2)
+			{
+				isOpen = TRUE;
+				break;
+			}
 		}
-	return result;
+	return isOpen;
 }
 
 int
@@ -326,14 +331,14 @@ FileSystem::Create(const char *name, int initialSize)
         freeMap = new BitMap(NumSectors);
         freeMap->FetchFrom(freeMapFile);
         sector = freeMap->Find();	// find a sector to hold the file header
-    	if (sector == -1) 		
+    	if (sector == -1)
             success = FALSE;		// no free block for file header 
         else if (!directory->Add(baseName, sector))
             success = FALSE;	// no space in directory
 		else {
 			hdr = new FileHeader;
 			if (!hdr->Allocate(freeMap, initialSize))
-					success = FALSE;	// no space on disk for data
+				success = FALSE;	// no space on disk for data
 			else {	
 				success = TRUE;
 				// everthing worked, flush all changes back to disk
@@ -502,7 +507,7 @@ FileSystem::removeFile(char *name, int sector, Directory *dir)
 	BitMap *freeMap;
 
 	// TODO: use mutex
-	if (isOpen(sector) != -1)
+	if (isOpen(sector))
 		return FALSE;
 	
 	fileHdr = new FileHeader;
