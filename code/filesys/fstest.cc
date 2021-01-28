@@ -195,3 +195,74 @@ LsDir(char *name)
 	delete dir;
 	delete dirFile;	
 }
+
+void
+FsTest()
+{
+	bool success = FALSE;
+	char fileNames[10][128+1];
+	char dirNames[5][128+1];
+
+	// directories
+	strcpy(dirNames[0], "dir1");
+	strcpy(dirNames[1], "dir1/dir2");
+	strcpy(dirNames[2], "dir3");
+	strcpy(dirNames[3], "dir3/dir4");
+	strcpy(dirNames[4], "dir3/dir4/dir5");
+
+	// files
+	strcpy(fileNames[0], "f1");
+	strcpy(fileNames[1], "f2");
+	strcpy(fileNames[2], "dir1/f3");
+	strcpy(fileNames[3], "dir1/f4");
+	strcpy(fileNames[4], "dir1/dir2/f5");
+	strcpy(fileNames[5], "dir1/dir2/f6");
+	strcpy(fileNames[6], "dir3/dir4/dir5/f7");
+	strcpy(fileNames[7], "dir3/dir4/f8");
+	strcpy(fileNames[8], "dir3/f9");
+	strcpy(fileNames[9], "f10");
+	
+
+
+
+	printf("########### FILE SYSTEM TEST ###########\n\n");
+	printf("creating the next files tree (5 directories, 10 files)\n");
+	printf(".\n");
+	printf("├── dir1\n");
+	printf("│   ├── dir2\n");
+	printf("│   │   ├── f5\n");
+	printf("│   │   └── f6\n");
+	printf("│   ├── f3\n");
+	printf("│   └── f4\n");
+	printf("├── dir3\n");
+	printf("│   ├── dir4\n");
+	printf("│   │   ├── dir5\n");
+	printf("│   │   │   └── f7\n");
+	printf("│   │   └── f8\n");
+	printf("│   └── f9\n");
+	printf("├── f1\n");
+	printf("├── f10\n");
+	printf("└── f2\n");
+
+	printf("\n########### FILE SYSTEM Creating Directories ###########\n\n");
+
+	for (int i = 0; i < 5; i++)
+	{
+		success = fileSystem->CreateDir(dirNames[i]);
+		printf("[CreateDir() test %d] Directory %s ", i, dirNames[i]);
+		printf(success ? "\033[32;1mOK\033[0m\n" : "ERROR\n");
+		ASSERT(success);
+	}
+	
+	printf("\n########### FILE SYSTEM Creating Files ###########\n\n");
+	for (int i = 0; i < 10; i++)
+	{
+		success = fileSystem->CreateDir(fileNames[i]);
+		printf("[Create() test %d] File %s ", i, fileNames[i]);
+		printf(success ? "\033[32;1mOK\033[0m\n" : "ERROR\n");
+		ASSERT(success);
+	}
+
+
+
+}

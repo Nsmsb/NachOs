@@ -62,7 +62,7 @@
 // External functions used by this file
 
 extern void ThreadTest (void), Copy (const char *unixFile, const char *nachosFile);
-extern void Print (char *file), PerformanceTest (void), LsDir(char *file);
+extern void Print (char *file), PerformanceTest (void), LsDir(char *file), FsTest(void);
 extern void StartProcess (char *file), ConsoleTest (char *in, char *out);
 extern void SynchConsoleTest(char *in, char *out);
 extern void MailTest (int networkID);
@@ -175,6 +175,9 @@ main (int argc, char **argv)
             ASSERT(argc > 1);
             LsDir(*(argv + 1));
             argCount = 2;
+		} else if (!strcmp (*argv, "-test"))
+		{			// filesSystem test
+			FsTest();
 		}
 		else if (!strcmp (*argv, "-t"))
 		{			// performance test
