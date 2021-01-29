@@ -278,6 +278,25 @@ FsTest()
 		delete openFile;
 	}
 
+	printf("\n########### FILE SYSTEM Removing Files ###########\n\n");
+	for (int i = 0; i < 3; i++)
+	{
+		success = fileSystem->Remove(fileNames[i]);
+		printf("[Remove() test %d] File %s ", i, fileNames[i]);
+		printf(success ? "\033[32;1mOK\033[0m\n" : "ERROR\n");
+		ASSERT(success);
+	}
+
+	// printf("\n########### FILE SYSTEM List Files ###########\n\n");
+	// for (int i = 0; i < 5; i++)
+	// {
+	// 	printf("content ff %s\n\n", dirNames[i]);
+	// 	LsDir(dirNames[i]);
+	// }
+	
+
+	
+
 
 
 }
