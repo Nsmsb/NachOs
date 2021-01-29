@@ -17,7 +17,6 @@ int main(){
 
 
 	char a='a';
-	int tid;
-	tid=UserThreadCreate(testeopen,(void *)&a,(int)UserThreadExit);
+	UserThreadCreate(testeopen,(void *)&a,(int)UserThreadExit);
 	return 0;
 }
